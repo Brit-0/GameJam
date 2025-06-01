@@ -8,6 +8,7 @@ public class ResourcesHandler : MonoBehaviour
     public static int coal;
     public static int iron;
     public static int oil;
+    public static int energy;
 
     public static int co2LvlIncreaser, co2LvlDecreaser, co2Lvl;
 
@@ -18,7 +19,7 @@ public class ResourcesHandler : MonoBehaviour
 
     public void GetMoney()
     {
-        money++;    
+        money += 10;    
     }
 
     private void Update()

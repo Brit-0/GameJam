@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -12,8 +11,10 @@ public class Machine
     public int price;
     public int qnt;
     public int delay;
+    public int energyWaste;
     public int co2Lvl;
     public Tile tile;
+    public GameObject buyable;
 }
 
 public class MachinesHandler : MonoBehaviour
@@ -22,14 +23,16 @@ public class MachinesHandler : MonoBehaviour
 
     [SerializeField] private List<Machine> allMachines;
 
-    private Machine coalExtractor, oilExtractor;
+    private int currentBuyableIndex;
+    private Machine coalExtractor, oilExtractor, thermalPowerPlant;
 
     private void Awake()
     {
         main = this;
 
         coalExtractor = (Machine)GetMachine("CoalExtractor");
-        oilExtractor = (Machine)GetMachine("OilExtractor");
+        thermalPowerPlant = (Machine)GetMachine("ThermalPowerPlant");
+        oilExtractor = (Machine)GetMachine("OilExtractor");    
     }
 
     public object GetMachine(string machineName)
@@ -55,7 +58,9 @@ public class MachinesHandler : MonoBehaviour
             if (machine.qnt == 0)
             {
                 StartCoroutine(machine.name + "Coroutine");
-                HUDHandler.main.ShowEnergies(machine);
+                //HUDHandler.main.ShowEnergies(machine);
+                currentBuyableIndex++;
+                ShowNextBuyable();
             }
 
             print("Comprou Máquina");
@@ -87,6 +92,13 @@ public class MachinesHandler : MonoBehaviour
         }
     }
 
+    private void ShowNextBuyable()
+    {
+        if (currentBuyableIndex >= allMachines.Count) return;
+
+        allMachines[currentBuyableIndex].buyable.SetActive(true);
+    }
+
     private IEnumerator CoalExtractorCoroutine()
     {
         yield return new WaitForSeconds(coalExtractor.delay);
@@ -99,20 +111,21 @@ public class MachinesHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(oilExtractor.delay);
         ResourcesHandler.oil += oilExtractor.qnt;
+        ResourcesHandler.energy -= oilExtractor.energyWaste * oilExtractor.qnt;
 
-        if (GameObject.Find("OilExtractor").transform.Find("Toggles").Find("CoalTog").GetComponent<Toggle>().isOn)
+        StartCoroutine(OilExtractorCoroutine());
+    }
+
+    private IEnumerator ThermalPowerPlantCoroutine()
+    {
+        yield return new WaitForSeconds(thermalPowerPlant.delay);
+
+        if (ResourcesHandler.coal > 0)
         {
-            if (ResourcesHandler.coal > 0)
-            {
-                ResourcesHandler.coal--;
-            }
-            else
-            {
-                ResourcesHandler.money--;
-            }
+            ResourcesHandler.coal--;
+            ResourcesHandler.energy++;
         }
-        
 
-            StartCoroutine(OilExtractorCoroutine());
+        StartCoroutine(ThermalPowerPlantCoroutine());
     }
 }

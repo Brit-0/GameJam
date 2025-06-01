@@ -6,7 +6,7 @@ public class HUDHandler : MonoBehaviour
 {
     public static HUDHandler main;
 
-    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl;
+    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl;
     [SerializeField] Slider cO2Slider;
 
     private void Awake()
@@ -26,6 +26,8 @@ public class HUDHandler : MonoBehaviour
         ironLbl.text = "Ferro: " + ResourcesHandler.iron;
         oilLbl.text = "Petróleo: " + ResourcesHandler.oil;
 
+        energyLbl.text = "Energia: " + ResourcesHandler.energy;
+
         cO2Slider.value = ResourcesHandler.co2LvlIncreaser - ResourcesHandler.co2LvlDecreaser;
     }
 
@@ -36,6 +38,11 @@ public class HUDHandler : MonoBehaviour
 
     public void ShowEnergies(Machine machine)
     {
-        GameObject.Find(machine.name).transform.Find("Toggles").gameObject.SetActive(true);
+        GameObject toggles = GameObject.Find(machine.name).transform.Find("Toggles").gameObject;
+
+        if (toggles)
+        {
+            toggles.SetActive(true);
+        }
     }
 }
