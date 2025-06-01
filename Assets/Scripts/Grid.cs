@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Grid
 {
-
     private int width, height;
     private float cellSize;
     private int[,] gridArray;

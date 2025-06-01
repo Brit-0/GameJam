@@ -4,53 +4,29 @@ public class ResourcesHandler : MonoBehaviour
 {
     public static ResourcesHandler main;
 
-    [SerializeField] private HUDHandler hud;
+    public static int money;
+    public static int coal;
+    public static int iron;
+    public static int oil;
 
-    [SerializeField] private int money;
-    [SerializeField] private int coal;
+    public static int co2LvlIncreaser, co2LvlDecreaser, co2Lvl;
 
     private void Awake()
     {
         main = this;
     }
 
-    public int Coal
-    {
-        get
-        {
-            return coal;
-        }
-
-        set
-        {
-            coal = value;
-            hud.updateResources();
-        }
-    }
-    public int Money
-    {
-        get
-        {
-            return money;
-        } 
-        
-        set
-        {
-            money = value;
-            hud.updateResources();
-        }
-    }
-
     public void GetMoney()
     {
-        Money++;    
+        money++;    
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Money++;
+            money++;
         }
     }
+
 }

@@ -1,13 +1,41 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HUDHandler : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl;
+    public static HUDHandler main;
 
-    public void updateResources()
+    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl;
+    [SerializeField] Slider cO2Slider;
+
+    private void Awake()
     {
-        moneyLbl.text = "Dinheiro: " + ResourcesHandler.main.Money;
-        coalLbl.text = "Carvão: " + ResourcesHandler.main.Coal;
+        main = this;
+    }
+
+    private void Update()
+    {
+        UpdateResources();
+    }
+
+    private void UpdateResources()
+    {
+        moneyLbl.text = "Dinheiro: " + ResourcesHandler.money;
+        coalLbl.text = "Carvão: " + ResourcesHandler.coal;
+        ironLbl.text = "Ferro: " + ResourcesHandler.iron;
+        oilLbl.text = "Petróleo: " + ResourcesHandler.oil;
+
+        cO2Slider.value = ResourcesHandler.co2LvlIncreaser - ResourcesHandler.co2LvlDecreaser;
+    }
+
+    public void UpdateQuantities(Machine machine)
+    {
+        GameObject.Find(machine.name).transform.Find("Quantity").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
+    }
+
+    public void ShowEnergies(Machine machine)
+    {
+        GameObject.Find(machine.name).transform.Find("Toggles").gameObject.SetActive(true);
     }
 }

@@ -1,0 +1,54 @@
+{
+    "name": "TerrainInput",
+    "maps": [
+        {
+            "name": "TerrainControl",
+            "id": "b1edf47c-cce8-42fd-b88e-9a607649f0ea",
+            "actions": [
+                {
+                    "name": "Drag",
+                    "type": "Button",
+                    "id": "0c6f0afa-62fc-49f7-91fd-18f7e95539f7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Scroll",
+                    "type": "PassThrough",
+                    "id": "216250af-d942-4716-aa7c-166b47d14759",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "4df0d436-b849-420c-a2ec-8ba1593d1d10",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drag",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8e7ed333-0959-449b-8221-d1ff0219900b",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scroll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
