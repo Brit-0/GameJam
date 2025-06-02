@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using TMPro;
+using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,7 @@ public class HUDHandler : MonoBehaviour
     [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl;
     [SerializeField] TextMeshProUGUI feedbackLbl;
     [SerializeField] Slider cO2Slider;
+    private float currentCO2, currentVelocity = 0;
 
     private void Awake()
     {
@@ -32,7 +34,8 @@ public class HUDHandler : MonoBehaviour
 
         energyLbl.text = "Energia: " + ResourcesHandler.energy;
 
-        cO2Slider.value = ResourcesHandler.co2LvlIncreaser - ResourcesHandler.co2LvlDecreaser;
+        currentCO2 = Mathf.SmoothDamp(cO2Slider.value, ResourcesHandler.co2LvlIncreaser - ResourcesHandler.co2LvlDecreaser, ref currentVelocity, 100 * Time.deltaTime);
+        cO2Slider.value = currentCO2;
     }
 
     public void UpdateQuantities(Machine machine)
