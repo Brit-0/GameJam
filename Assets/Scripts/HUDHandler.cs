@@ -80,4 +80,5 @@ public class HUDHandler : MonoBehaviour
             toggles.SetActive(true);
         }
     }
+
 }

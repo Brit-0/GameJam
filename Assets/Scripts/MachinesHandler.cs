@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
@@ -7,12 +8,20 @@ using UnityEngine.UI;
 [System.Serializable]
 public class Machine
 {
+    [Header("PRINCIPAL")]
     public string name;
     public int price;
     public int qnt;
+    [Header("GERAÇÃO")]
+    public int generation;
     public int delay;
+    [Header("CONSUMO")]
+    public Resource resourceConsumed;
+    public int consumption;
     public int energyWaste;
+    [Header("POLUIÇÃO")]
     public int co2Lvl;
+    [Header("REFERÊNCIAS")]
     public Tile tile;
     public GameObject buyable;
 }
@@ -64,6 +73,11 @@ public class MachinesHandler : MonoBehaviour
 
                 currentBuyableIndex++; //PEGAR PRÓXIMO DESBLOQUEÁVEL E 
                 ShowNextBuyable(); //MOSTRAR ELE
+
+                if (machine.price == 0)
+                {
+                    machine.price = 30;
+                }
             }
             else
             {
@@ -109,7 +123,7 @@ public class MachinesHandler : MonoBehaviour
     private IEnumerator CoalExtractorCoroutine()
     {
         yield return new WaitForSeconds(coalExtractor.delay);
-        ResourcesHandler.coal += coalExtractor.qnt;
+        ResourcesHandler.coal += coalExtractor.qnt * coalExtractor.generation;
 
         StartCoroutine(CoalExtractorCoroutine());
     }
@@ -121,7 +135,7 @@ public class MachinesHandler : MonoBehaviour
         if (ResourcesHandler.energy >= oilExtractor.energyWaste * oilExtractor.qnt)
         {
             ResourcesHandler.energy -= oilExtractor.energyWaste * oilExtractor.qnt;
-            ResourcesHandler.oil += oilExtractor.qnt;
+            ResourcesHandler.oil += oilExtractor.generation;
         }
         else
         {
@@ -137,8 +151,8 @@ public class MachinesHandler : MonoBehaviour
 
         if (ResourcesHandler.coal >= thermalPowerPlant.qnt)
         {
-            ResourcesHandler.coal -= thermalPowerPlant.qnt;
-            ResourcesHandler.energy += thermalPowerPlant.qnt;
+            ResourcesHandler.coal -= thermalPowerPlant.qnt * thermalPowerPlant.consumption;
+            ResourcesHandler.energy += thermalPowerPlant.qnt * thermalPowerPlant.generation;
         }
         else
         {
@@ -146,5 +160,18 @@ public class MachinesHandler : MonoBehaviour
         }
 
         StartCoroutine(ThermalPowerPlantCoroutine());
+    }
+
+    public Machine GetMachineFromResource(Resource resource)
+    {
+        switch (resource)
+        {
+            case Resource.Carvão: return coalExtractor;
+            case Resource.Ferro: return null;
+            case Resource.Petróleo: return oilExtractor;
+            case Resource.Energia: return thermalPowerPlant;
+        }
+
+        return null;
     }
 }

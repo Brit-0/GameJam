@@ -1,5 +1,13 @@
 using UnityEngine;
 
+public enum Resource
+{
+    Carvão,
+    Ferro,
+    Petróleo,
+    Energia
+}
+
 public class ResourcesHandler : MonoBehaviour
 {
     public static ResourcesHandler main;
@@ -19,7 +27,7 @@ public class ResourcesHandler : MonoBehaviour
 
     public void GetMoney()
     {
-        money += 10;    
+        money++;    
     }
 
     private void Update()
@@ -37,6 +45,7 @@ public class ResourcesHandler : MonoBehaviour
             case Resource.Carvão: return coal;
             case Resource.Ferro: return iron;
             case Resource.Petróleo: return oil;
+            case Resource.Energia: return energy;
         }
 
         return 0;
@@ -49,6 +58,7 @@ public class ResourcesHandler : MonoBehaviour
             case Resource.Carvão: coal = amount; break;
             case Resource.Ferro: iron = amount; break;
             case Resource.Petróleo: oil = amount; break;
+            case Resource.Energia: energy = amount; break;
         }
     }
 

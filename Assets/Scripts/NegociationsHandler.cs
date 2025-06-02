@@ -2,13 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public  enum Resource
-{
-    Carvão,
-    Ferro,
-    Petróleo
-}
-
 public class NegociationsHandler : MonoBehaviour
 {
     private UITweener uITweener;
