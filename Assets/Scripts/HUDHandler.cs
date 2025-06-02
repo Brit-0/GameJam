@@ -10,6 +10,7 @@ public class HUDHandler : MonoBehaviour
     public static HUDHandler main;
 
     [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl;
+    [SerializeField] TextMeshProUGUI feedbackLbl;
     [SerializeField] Slider cO2Slider;
 
     private void Awake()
@@ -53,6 +54,15 @@ public class HUDHandler : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         errorIcon.SetActive(false);
+    }
+
+    public IEnumerator FlashFeedback()
+    {
+        feedbackLbl.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        feedbackLbl.gameObject.SetActive(false);
     }
 
     public void FirstPurchaseUpdate(Machine machine)

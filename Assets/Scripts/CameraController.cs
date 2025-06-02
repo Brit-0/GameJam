@@ -18,7 +18,7 @@ public class CameraController : MonoBehaviour
     
     //ZOOMS
     private float zoomTarget;
-    private float multiplier = 2f, minZoom = 1f, maxZoom = 6.85f, smoothTime = .1f;
+    private float multiplier = 2f, minZoom = 1f, maxZoom = 6.25f, smoothTime = .1f;
     private float velocity = 0f;
 
     //EXPANDING & CONTRACTING

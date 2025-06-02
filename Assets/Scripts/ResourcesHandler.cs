@@ -26,7 +26,29 @@ public class ResourcesHandler : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            money++;
+            GetMoney();
+        }
+    }
+
+    public int GetResource(Resource resource)
+    {
+        switch (resource)
+        {
+            case Resource.Carvão: return coal;
+            case Resource.Ferro: return iron;
+            case Resource.Petróleo: return oil;
+        }
+
+        return 0;
+    }
+
+    public void UpdateResource(Resource resource, int amount)
+    {
+        switch (resource)
+        {
+            case Resource.Carvão: coal = amount; break;
+            case Resource.Ferro: iron = amount; break;
+            case Resource.Petróleo: oil = amount; break;
         }
     }
 
