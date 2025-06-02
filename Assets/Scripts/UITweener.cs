@@ -20,6 +20,7 @@ public class UITweener : MonoBehaviour
 
     public void PopUpTween(float scale)
     {
+        rectTrans.localScale = Vector3.zero;
         LeanTween.scale(rectTrans, new Vector3(scale, scale, scale), .2f);
     }
 

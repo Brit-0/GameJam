@@ -16,7 +16,7 @@ public class TerrainLogic : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && terrainCam.pixelRect.Contains(Input.mousePosition))
         {
             if (currentTile)
             {
@@ -52,6 +52,8 @@ public class TerrainLogic : MonoBehaviour
     {
         Vector3Int clickedTilepos = tm.WorldToCell(terrainCam.ScreenToWorldPoint(Input.mousePosition));
         TileBase clickedTile = tm.GetTile(clickedTilepos);
+
+        if (clickedTile == grassTile) return;
 
         tm.SetTile(clickedTilepos, grassTile);
 

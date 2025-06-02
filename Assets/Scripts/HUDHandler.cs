@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Runtime.InteropServices;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +36,29 @@ public class HUDHandler : MonoBehaviour
 
     public void UpdateQuantities(Machine machine)
     {
-        GameObject.Find(machine.name).transform.Find("Quantity").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
+        GameObject.Find(machine.name).transform.Find("New/Quantity").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
+    }
+
+    public void UpdatePrice(Machine machine)
+    {
+        GameObject.Find(machine.name).transform.Find("New/NewBuyBtn/BtnLbl").GetComponent<TextMeshProUGUI>().text = "$" + machine.price;
+    }
+
+    public IEnumerator FlashError(Machine machine)
+    {
+        GameObject errorIcon = GameObject.Find(machine.name).transform.Find("New/ErrorIcon").gameObject; 
+    
+        errorIcon.SetActive(true);
+
+        yield return new WaitForSeconds(1f);
+
+        errorIcon.SetActive(false);
+    }
+
+    public void FirstPurchaseUpdate(Machine machine)
+    {
+        GameObject.Find(machine.name).transform.Find("First").gameObject.SetActive(false);
+        GameObject.Find(machine.name).transform.Find("New").gameObject.SetActive(true);
     }
 
     public void ShowEnergies(Machine machine)

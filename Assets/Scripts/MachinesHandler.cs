@@ -59,11 +59,19 @@ public class MachinesHandler : MonoBehaviour
             {
                 StartCoroutine(machine.name + "Coroutine");
                 //HUDHandler.main.ShowEnergies(machine);
-                currentBuyableIndex++;
-                ShowNextBuyable();
+
+                HUDHandler.main.FirstPurchaseUpdate(machine);
+
+                currentBuyableIndex++; //PEGAR PRÓXIMO DESBLOQUEÁVEL E 
+                ShowNextBuyable(); //MOSTRAR ELE
+            }
+            else
+            {
+                machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+                HUDHandler.main.UpdatePrice(machine);
             }
 
-            print("Comprou Máquina");
+                print("Comprou Máquina");
 
             CameraController.main.ExpandViewport("Build");
             TerrainLogic.currentTile = machine.tile;
@@ -72,7 +80,6 @@ public class MachinesHandler : MonoBehaviour
         {
             print("Precisa de mais " + (machine.price - ResourcesHandler.money) + " reais");
         }
-        
     }
 
     public void BuyDinamite()
@@ -110,20 +117,32 @@ public class MachinesHandler : MonoBehaviour
     private IEnumerator OilExtractorCoroutine()
     {
         yield return new WaitForSeconds(oilExtractor.delay);
-        ResourcesHandler.oil += oilExtractor.qnt;
-        ResourcesHandler.energy -= oilExtractor.energyWaste * oilExtractor.qnt;
 
-        StartCoroutine(OilExtractorCoroutine());
+        if (ResourcesHandler.energy >= oilExtractor.energyWaste * oilExtractor.qnt)
+        {
+            ResourcesHandler.energy -= oilExtractor.energyWaste * oilExtractor.qnt;
+            ResourcesHandler.oil += oilExtractor.qnt;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(oilExtractor));
+        }
+
+            StartCoroutine(OilExtractorCoroutine());
     }
 
     private IEnumerator ThermalPowerPlantCoroutine()
     {
         yield return new WaitForSeconds(thermalPowerPlant.delay);
 
-        if (ResourcesHandler.coal > 0)
+        if (ResourcesHandler.coal >= thermalPowerPlant.qnt)
         {
-            ResourcesHandler.coal--;
-            ResourcesHandler.energy++;
+            ResourcesHandler.coal -= thermalPowerPlant.qnt;
+            ResourcesHandler.energy += thermalPowerPlant.qnt;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(thermalPowerPlant));
         }
 
         StartCoroutine(ThermalPowerPlantCoroutine());
