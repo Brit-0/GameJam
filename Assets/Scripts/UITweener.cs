@@ -15,7 +15,9 @@ public class UITweener : MonoBehaviour
 
     public void CloseTween()
     {
-        LeanTween.scale(rectTrans, Vector2.zero, .2f);
+        var seq = LeanTween.sequence();
+        seq.append(LeanTween.scale(rectTrans, Vector2.zero, .2f));
+        seq.append(() => rectTrans.gameObject.SetActive(false));
     }
 
     public void PopUpTween(float scale)
@@ -30,6 +32,21 @@ public class UITweener : MonoBehaviour
         {
             LeanTween.scale(rectTrans, rectTrans.localScale * 0.8f, clickTime).setLoopPingPong(1);
         }
+    }
+
+    public void AlphaFlick()
+    {
+        if (LeanTween.isTweening(rectTrans)) return;
+
+        LeanTween.alpha(rectTrans, .8f, 2f).setLoopPingPong(1);
+    }
+
+    public void FadeOut()
+    {
+        var seq = LeanTween.sequence();
+        seq.append(LeanTween.alpha(rectTrans, 0, .5f));
+        seq.append(() => { rectTrans.gameObject.SetActive(false); } );
+        seq.append(LeanTween.alpha(rectTrans, 1, .5f));
     }
 
     public void ColorFlickTween(Color color, float speed)

@@ -18,10 +18,15 @@ public class TooltipLogic : MonoBehaviour
 
         TextMeshProUGUI CtipLbl = tipPanel.transform.Find("CTipLbl").GetComponent<TextMeshProUGUI>();
         CtipLbl.text = Regex.Replace(CtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.consumption) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
-        tipPanel.SetActive(true);
+
+        TextMeshProUGUI EtipLbl = tipPanel.transform.Find("ETipLbl").GetComponent<TextMeshProUGUI>();
+        EtipLbl.text = Regex.Replace(EtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.energyWaste) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
+  
 
         TextMeshProUGUI GtipLbl = tipPanel.transform.Find("GTipLbl").GetComponent<TextMeshProUGUI>();  
         GtipLbl.text = Regex.Replace(GtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.generation) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
+
+
         tipPanel.SetActive(true);
     }
 }

@@ -1,7 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
-using static Unity.Collections.AllocatorManager;
 
 public class CameraController : MonoBehaviour
 {
@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
     private float velocity = 0f;
 
     //EXPANDING & CONTRACTING
-    private Rect ogRect = new(0.587f, 0.03f, 0.4f, 0.5f);
+    private Rect ogRect = new(0.44f, 0.04f, 0.54f, 0.7f);
     private Rect expRect = new(0.16f, 0.1f, 0.7f, 0.8f);
 
     private bool isDragging;
@@ -44,8 +44,11 @@ public class CameraController : MonoBehaviour
         isDragging = ctx.started || ctx.performed;
     }
 
-    public void ExpandViewport(string purchaseType)
+    public IEnumerator ExpandViewport(string purchaseType)
     {
+        print("foi");
+        yield return new WaitForSeconds(1f);
+
         terrainCam.rect = expRect;
 
         if (purchaseType == "Build")

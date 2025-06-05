@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Runtime.InteropServices;
 using TMPro;
-using Unity.PlasticSCM.Editor.WebApi;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +7,15 @@ public class HUDHandler : MonoBehaviour
 {
     public static HUDHandler main;
 
-    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl;
+    [Header("LABELS")]
+    [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl, ironBarLbl;
     [SerializeField] TextMeshProUGUI feedbackLbl;
+    [Header("SLIDER")]
     [SerializeField] Slider cO2Slider;
+    [Header("OVERLAY")]
+    [SerializeField] GameObject heatOverlay;
+    [Header("PARTICLES")]
+    [SerializeField] ParticleSystem moneyParticle2;
     private float currentCO2, currentVelocity = 0;
 
     private void Awake()
@@ -23,16 +26,22 @@ public class HUDHandler : MonoBehaviour
     private void Update()
     {
         UpdateResources();
+
+        if (cO2Slider.value > 9.5f)
+        {
+            heatOverlay.GetComponent<UITweener>().AlphaFlick();
+        }
     }
 
     private void UpdateResources()
     {
-        moneyLbl.text = "Dinheiro: " + ResourcesHandler.money;
-        coalLbl.text = "Carvão: " + ResourcesHandler.coal;
-        ironLbl.text = "Ferro: " + ResourcesHandler.iron;
-        oilLbl.text = "Petróleo: " + ResourcesHandler.oil;
+        moneyLbl.text = ResourcesHandler.money.ToString();
+        coalLbl.text = ResourcesHandler.coal.ToString();
+        ironLbl.text = ResourcesHandler.iron.ToString();
+        oilLbl.text = ResourcesHandler.oil.ToString();
+        ironBarLbl.text = ResourcesHandler.ironBar.ToString();
 
-        energyLbl.text = "Energia: " + ResourcesHandler.energy;
+        energyLbl.text = ResourcesHandler.energy.ToString();
 
         currentCO2 = Mathf.SmoothDamp(cO2Slider.value, ResourcesHandler.co2LvlIncreaser - ResourcesHandler.co2LvlDecreaser, ref currentVelocity, 100 * Time.deltaTime);
         cO2Slider.value = currentCO2;
@@ -40,17 +49,22 @@ public class HUDHandler : MonoBehaviour
 
     public void UpdateQuantities(Machine machine)
     {
-        GameObject.Find(machine.name).transform.Find("New/Quantity").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
+        machine.buyable.transform.Find("Quantity/QuantityLbl").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
     }
 
     public void UpdatePrice(Machine machine)
     {
-        GameObject.Find(machine.name).transform.Find("New/NewBuyBtn/BtnLbl").GetComponent<TextMeshProUGUI>().text = "$" + machine.price;
+        machine.buyable.transform.Find("Price/PriceLbl").GetComponent<TextMeshProUGUI>().text = machine.price.ToString();
+    }
+
+    public void SpentMoneyParticle()
+    {
+        moneyParticle2.Play();
     }
 
     public IEnumerator FlashError(Machine machine)
     {
-        GameObject errorIcon = GameObject.Find(machine.name).transform.Find("New/ErrorIcon").gameObject; 
+        GameObject errorIcon = machine.buyable.transform.Find("ErrorIcon").gameObject; 
     
         errorIcon.SetActive(true);
 
@@ -70,8 +84,9 @@ public class HUDHandler : MonoBehaviour
 
     public void FirstPurchaseUpdate(Machine machine)
     {
-        GameObject.Find(machine.name).transform.Find("First").gameObject.SetActive(false);
-        GameObject.Find(machine.name).transform.Find("New").gameObject.SetActive(true);
+        LeanTween.color(machine.buyable.transform.Find("Button/MachineIcon").GetComponent<RectTransform>(), Color.white, 1f);
+        machine.buyable.transform.Find("Quantity").gameObject.SetActive(true);
+        machine.buyable.transform.Find("Tip").gameObject.SetActive(true);
     }
 
     public void ShowEnergies(Machine machine)

@@ -4,8 +4,10 @@ public enum Resource
 {
     Carvão,
     Ferro,
+    BarraDeFerro,
     Petróleo,
-    Energia
+    Energia,
+    
 }
 
 public class ResourcesHandler : MonoBehaviour
@@ -17,6 +19,7 @@ public class ResourcesHandler : MonoBehaviour
     public static int iron;
     public static int oil;
     public static int energy;
+    public static int ironBar;
 
     public static int co2LvlIncreaser, co2LvlDecreaser, co2Lvl;
 
@@ -32,9 +35,9 @@ public class ResourcesHandler : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q) && Input.GetKeyDown(KeyCode.E))
         {
-            GetMoney();
+            money += 100;
         }
     }
 
@@ -46,6 +49,7 @@ public class ResourcesHandler : MonoBehaviour
             case Resource.Ferro: return iron;
             case Resource.Petróleo: return oil;
             case Resource.Energia: return energy;
+            case Resource.BarraDeFerro: return ironBar;
         }
 
         return 0;
@@ -59,6 +63,7 @@ public class ResourcesHandler : MonoBehaviour
             case Resource.Ferro: iron = amount; break;
             case Resource.Petróleo: oil = amount; break;
             case Resource.Energia: energy = amount; break;
+            case Resource.BarraDeFerro: ironBar = amount; break;
         }
     }
 

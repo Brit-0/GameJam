@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 [System.Serializable]
 public class Machine
@@ -22,7 +20,7 @@ public class Machine
     [Header("POLUIÇÃO")]
     public int co2Lvl;
     [Header("REFERÊNCIAS")]
-    public Tile tile;
+    public TileBase tile;
     public GameObject buyable;
 }
 
@@ -30,10 +28,12 @@ public class MachinesHandler : MonoBehaviour
 {
     public static MachinesHandler main;
 
-    [SerializeField] private List<Machine> allMachines;
+    [SerializeField] private List<Machine> allMachines, allHelpers;
 
-    private int currentBuyableIndex;
-    private Machine coalExtractor, oilExtractor, thermalPowerPlant;
+    private int currentBuyableIndex, currentHelperIndex;
+    private Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant;
+    
+    
 
     private void Awake()
     {
@@ -41,7 +41,10 @@ public class MachinesHandler : MonoBehaviour
 
         coalExtractor = (Machine)GetMachine("CoalExtractor");
         thermalPowerPlant = (Machine)GetMachine("ThermalPowerPlant");
-        oilExtractor = (Machine)GetMachine("OilExtractor");    
+        oilExtractor = (Machine)GetMachine("OilExtractor");
+        ironExtractor = (Machine)GetMachine("IronExtractor");
+        smallMetalIndustry = (Machine)GetMachine("SmallMetalIndustry");
+        oilPowerPlant = (Machine)GetMachine("OilPowerPlant");
     }
 
     public object GetMachine(string machineName)
@@ -56,6 +59,19 @@ public class MachinesHandler : MonoBehaviour
         return null;
     }
 
+    public object GetHelper(string machineName)
+    {
+        foreach (Machine machine in allHelpers)
+        {
+            if (machine.name == machineName)
+            {
+                return machine;
+            }
+        }
+        return null;
+    }
+
+
     public void BuyMachine(string machineName)
     {
         Machine machine = (Machine)GetMachine(machineName);
@@ -67,12 +83,11 @@ public class MachinesHandler : MonoBehaviour
             if (machine.qnt == 0)
             {
                 StartCoroutine(machine.name + "Coroutine");
-                //HUDHandler.main.ShowEnergies(machine);
 
                 HUDHandler.main.FirstPurchaseUpdate(machine);
 
                 currentBuyableIndex++; //PEGAR PRÓXIMO DESBLOQUEÁVEL E 
-                ShowNextBuyable(); //MOSTRAR ELE
+                //ShowNextBuyable(); //MOSTRAR ELE
 
                 if (machine.price == 0)
                 {
@@ -82,12 +97,41 @@ public class MachinesHandler : MonoBehaviour
             else
             {
                 machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
-                HUDHandler.main.UpdatePrice(machine);
             }
 
-                print("Comprou Máquina");
+            HUDHandler.main.UpdatePrice(machine);
+            HUDHandler.main.SpentMoneyParticle();
+            StartCoroutine(CameraController.main.ExpandViewport("Build"));
+            TerrainLogic.currentTile = machine.tile;
+        }
+        else
+        {
+            print("Precisa de mais " + (machine.price - ResourcesHandler.money) + " reais");
+        }
+    }
 
-            CameraController.main.ExpandViewport("Build");
+    public void BuyHelper(string machineName)
+    {
+        Machine machine = (Machine)GetMachine(machineName);
+
+        if (ResourcesHandler.money >= machine.price)
+        {
+            ResourcesHandler.money -= machine.price;
+
+            if (machine.qnt == 0)
+            {
+                HUDHandler.main.FirstPurchaseUpdate(machine);
+
+                currentHelperIndex++; 
+            }
+            else
+            {
+                machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+            }
+
+            HUDHandler.main.UpdatePrice(machine);
+            HUDHandler.main.SpentMoneyParticle();
+            StartCoroutine(CameraController.main.ExpandViewport("Build"));
             TerrainLogic.currentTile = machine.tile;
         }
         else
@@ -106,6 +150,7 @@ public class MachinesHandler : MonoBehaviour
             TerrainLogic.isDestroying = true;
 
             CameraController.main.ExpandViewport("Destroy");
+            HUDHandler.main.SpentMoneyParticle();
         }
         else
         {
@@ -126,6 +171,14 @@ public class MachinesHandler : MonoBehaviour
         ResourcesHandler.coal += coalExtractor.qnt * coalExtractor.generation;
 
         StartCoroutine(CoalExtractorCoroutine());
+    }
+
+    private IEnumerator IronExtractorCoroutine()
+    {
+        yield return new WaitForSeconds(ironExtractor.delay);
+        ResourcesHandler.iron += ironExtractor.qnt * ironExtractor.generation;
+
+        StartCoroutine(IronExtractorCoroutine());
     }
 
     private IEnumerator OilExtractorCoroutine()
@@ -160,6 +213,42 @@ public class MachinesHandler : MonoBehaviour
         }
 
         StartCoroutine(ThermalPowerPlantCoroutine());
+    }
+
+    private IEnumerator SmallMetalIndustryCoroutine()
+    {
+        yield return new WaitForSeconds(smallMetalIndustry.delay);
+
+        if (ResourcesHandler.iron >= smallMetalIndustry.consumption * smallMetalIndustry.qnt)
+        {
+            ResourcesHandler.iron -= smallMetalIndustry.consumption * smallMetalIndustry.qnt;
+            ResourcesHandler.energy -= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt;
+
+            ResourcesHandler.ironBar += smallMetalIndustry.qnt * smallMetalIndustry.generation;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(smallMetalIndustry));
+        }
+
+        StartCoroutine(SmallMetalIndustryCoroutine());
+    }
+
+    private IEnumerator OilPowerPlantCoroutine()
+    {
+        yield return new WaitForSeconds(oilPowerPlant.delay);
+
+        if (ResourcesHandler.oil >= oilPowerPlant.consumption * oilPowerPlant.qnt)
+        {
+            ResourcesHandler.oil -= oilPowerPlant.consumption * oilPowerPlant.qnt;
+            ResourcesHandler.energy += oilPowerPlant.generation * oilPowerPlant.qnt;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(oilPowerPlant));
+        }
+
+        StartCoroutine(OilPowerPlantCoroutine());
     }
 
     public Machine GetMachineFromResource(Resource resource)
