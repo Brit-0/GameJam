@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 150.70073, y: -0.00000095367}
-  m_SizeDelta: {x: 113.1334, y: 39.3644}
+  m_AnchoredPosition: {x: 167.07207, y: -0.00000095367}
+  m_SizeDelta: {x: 80.3907, y: 39.3644}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1478702459404740128
 CanvasRenderer:
@@ -96,7 +96,7 @@ MonoBehaviour:
   m_fontSizeBase: 18.77
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 0
+  m_fontSizeMin: 13.24
   m_fontSizeMax: 19.47
   m_fontStyle: 0
   m_HorizontalAlignment: 4
@@ -346,8 +346,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -53.992992, y: 0}
-  m_SizeDelta: {x: 296.25, y: 28.97}
+  m_AnchoredPosition: {x: -53.991, y: -0.8143}
+  m_SizeDelta: {x: 296.25, y: 31.787}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1086371656064863399
 CanvasRenderer:
@@ -377,7 +377,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Descri\xE7\xE3o da Missao"
+  m_text: "Descri\xE7\xE3o da miss\xE3o"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 511c246eec221e444bbbc9bd8ba02ce5, type: 2}
   m_sharedMaterial: {fileID: 3017772058343088437, guid: 511c246eec221e444bbbc9bd8ba02ce5, type: 2}
@@ -411,16 +411,16 @@ MonoBehaviour:
   m_fontSizeMin: 0
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 20
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
