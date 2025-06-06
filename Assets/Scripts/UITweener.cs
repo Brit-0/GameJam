@@ -54,9 +54,10 @@ public class UITweener : MonoBehaviour
         LeanTween.color(rectTrans, color, speed).setLoopPingPong(1);
     }
 
-    public int MoveTween(float end, float speed)
+    public void FadeAlpha(float toAlpha, float time)
     {
-        int id = LeanTween.moveLocalX(gameObject, end, .5f).setLoopPingPong().id;
-        return id;
+        LeanTween.alpha(rectTrans, toAlpha, time);
     }
+    
+  
 }
