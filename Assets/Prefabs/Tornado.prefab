@@ -4946,4 +4946,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 677000b11d08ce24298d7a8ddfd3b7bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
+  destroyedTile: {fileID: 11400000, guid: aca31f3a334964545bb01534151348c8, type: 2}
   locationsToGo: []

@@ -22,29 +22,41 @@ public class Machine
     [Header("REFERÊNCIAS")]
     public TileBase tile;
     public GameObject buyable;
+    [Header("VARIÁVEIS")]
+    public bool alreadyBought;
 }
+
 
 public class MachinesHandler : MonoBehaviour
 {
     public static MachinesHandler main;
 
-    [SerializeField] private List<Machine> allMachines, allHelpers;
+    [SerializeField] Texture2D dinamiteIcon, axeIcon;
+
+    [SerializeField] private List<Machine> allMachines;
+    [SerializeField] private List<Machine> allHelpers;
 
     private int currentBuyableIndex, currentHelperIndex;
-    private Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant;
-    
-    
+    private Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant, solarPanel, windmill;
+    private Machine smallReserve;
+    private int dinamitePrice = 50, axePrice = 30;
 
     private void Awake()
     {
         main = this;
 
+        //MAQUINAS
         coalExtractor = (Machine)GetMachine("CoalExtractor");
         thermalPowerPlant = (Machine)GetMachine("ThermalPowerPlant");
         oilExtractor = (Machine)GetMachine("OilExtractor");
         ironExtractor = (Machine)GetMachine("IronExtractor");
         smallMetalIndustry = (Machine)GetMachine("SmallMetalIndustry");
         oilPowerPlant = (Machine)GetMachine("OilPowerPlant");
+        solarPanel = (Machine)GetMachine("SolarPanel");
+        windmill = (Machine)GetMachine("Windmill");
+
+        //AUXILIARES
+        smallReserve = (Machine)GetMachine("SmallReserve");
     }
 
     public object GetMachine(string machineName)
@@ -59,13 +71,13 @@ public class MachinesHandler : MonoBehaviour
         return null;
     }
 
-    public object GetHelper(string machineName)
+    public object GetHelper(string helperName)
     {
-        foreach (Machine machine in allHelpers)
+        foreach (Machine helper in allHelpers)
         {
-            if (machine.name == machineName)
+            if (helper.name == helperName)
             {
-                return machine;
+                return helper;
             }
         }
         return null;
@@ -76,12 +88,14 @@ public class MachinesHandler : MonoBehaviour
     {
         Machine machine = (Machine)GetMachine(machineName);
 
-        if (ResourcesHandler.money >= machine.price)
+        if (ResourcesHandler.money >= machine.price) //COMPRA SUCEDIDA
         {
             ResourcesHandler.money -= machine.price;
 
-            if (machine.qnt == 0)
+            if (!machine.alreadyBought) 
             {
+                machine.alreadyBought = true;
+
                 StartCoroutine(machine.name + "Coroutine");
 
                 HUDHandler.main.FirstPurchaseUpdate(machine);
@@ -93,78 +107,109 @@ public class MachinesHandler : MonoBehaviour
                 {
                     machine.price = 30;
                 }
+
+                StartCoroutine(CameraController.main.ExpandViewport("Build", 1f));
             }
             else
             {
                 machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+                StartCoroutine(CameraController.main.ExpandViewport("Build", 0f));
             }
 
             HUDHandler.main.UpdatePrice(machine);
             HUDHandler.main.SpentMoneyParticle();
-            StartCoroutine(CameraController.main.ExpandViewport("Build"));
+            
             TerrainLogic.currentTile = machine.tile;
         }
-        else
+        else //COMPRA FRACASSADA
         {
-            print("Precisa de mais " + (machine.price - ResourcesHandler.money) + " reais");
+            StartCoroutine(HUDHandler.main.FlashFeedback(CapitalistDialog.SelectDialog(CapitalistDialog.failedBuyMachine), 4f));
         }
     }
 
-    public void BuyHelper(string machineName)
+    public void BuyHelper(string helperName)
     {
-        Machine machine = (Machine)GetMachine(machineName);
+        Machine helper = (Machine)GetHelper(helperName);
 
-        if (ResourcesHandler.money >= machine.price)
+        if (ResourcesHandler.money >= helper.price)
         {
-            ResourcesHandler.money -= machine.price;
+            ResourcesHandler.money -= helper.price;
 
-            if (machine.qnt == 0)
+            if (!helper.alreadyBought)
             {
-                HUDHandler.main.FirstPurchaseUpdate(machine);
+                helper.alreadyBought = true;
 
-                currentHelperIndex++; 
+                HUDHandler.main.FirstPurchaseUpdate(helper);
+
+                currentHelperIndex++;
+
+                StartCoroutine(CameraController.main.ExpandViewport("Build", 1f));
             }
             else
             {
-                machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+                helper.price = Mathf.RoundToInt(helper.price * 1.5f / 10) * 10;
+                StartCoroutine(CameraController.main.ExpandViewport("Build", 0f));
             }
 
-            HUDHandler.main.UpdatePrice(machine);
+            HUDHandler.main.UpdatePrice(helper);
             HUDHandler.main.SpentMoneyParticle();
-            StartCoroutine(CameraController.main.ExpandViewport("Build"));
-            TerrainLogic.currentTile = machine.tile;
+
+            TerrainLogic.currentTile = helper.tile;
         }
         else
         {
-            print("Precisa de mais " + (machine.price - ResourcesHandler.money) + " reais");
+            StartCoroutine(HUDHandler.main.FlashFeedback(CapitalistDialog.SelectDialog(CapitalistDialog.failedBuyHelper), 4f));
         }
     }
 
     public void BuyDinamite()
     {
-        if (ResourcesHandler.money >= 50)
+        if (ResourcesHandler.money >= dinamitePrice)
         {
-            ResourcesHandler.money -= 50;
-            print("Comprou Dinamite");
+            ResourcesHandler.money -= dinamitePrice;
 
-            TerrainLogic.isDestroying = true;
+            TerrainLogic.isDemolishing = true;
 
-            CameraController.main.ExpandViewport("Destroy");
+            StartCoroutine(CameraController.main.ExpandViewport("Destroy", 0f));
             HUDHandler.main.SpentMoneyParticle();
+
+            Cursor.SetCursor(dinamiteIcon, Vector2.zero, CursorMode.ForceSoftware);
         }
         else
         {
-            print("Precisa de mais " + (50 - ResourcesHandler.money) + " reais");
+            StartCoroutine(HUDHandler.main.FlashFeedback("Precisa de mais " + (dinamitePrice - ResourcesHandler.money) + " reais", 2f)); 
+        }
+    }
+
+    public void BuyAxe()
+    {
+        if (ResourcesHandler.money >= axePrice)
+        {
+            ResourcesHandler.money -= axePrice;
+
+            TerrainLogic.isChopping = true;
+
+            StartCoroutine(CameraController.main.ExpandViewport("Chop", 0f));
+            HUDHandler.main.SpentMoneyParticle();
+
+            Cursor.SetCursor(axeIcon, Vector2.zero, CursorMode.ForceSoftware);
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashFeedback("Precisa de mais " + (dinamitePrice - ResourcesHandler.money) + " reais", 2f));
         }
     }
 
     private void ShowNextBuyable()
     {
+        print(currentBuyableIndex);
         if (currentBuyableIndex >= allMachines.Count) return;
 
         allMachines[currentBuyableIndex].buyable.SetActive(true);
     }
 
+
+    #region Coroutines
     private IEnumerator CoalExtractorCoroutine()
     {
         yield return new WaitForSeconds(coalExtractor.delay);
@@ -176,7 +221,17 @@ public class MachinesHandler : MonoBehaviour
     private IEnumerator IronExtractorCoroutine()
     {
         yield return new WaitForSeconds(ironExtractor.delay);
-        ResourcesHandler.iron += ironExtractor.qnt * ironExtractor.generation;
+        
+
+        if (ResourcesHandler.energy >= ironExtractor.energyWaste * ironExtractor.qnt)
+        {
+            ResourcesHandler.energy -= ironExtractor.energyWaste * ironExtractor.qnt;
+            ResourcesHandler.iron += ironExtractor.generation * ironExtractor.qnt;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(ironExtractor));
+        }
 
         StartCoroutine(IronExtractorCoroutine());
     }
@@ -250,6 +305,26 @@ public class MachinesHandler : MonoBehaviour
 
         StartCoroutine(OilPowerPlantCoroutine());
     }
+
+    private IEnumerator SolarPanelCoroutine()
+    {
+        yield return new WaitForSeconds(solarPanel.delay);
+
+        ResourcesHandler.energy += solarPanel.generation * solarPanel.qnt;
+
+        StartCoroutine(SolarPanelCoroutine());
+    }
+
+    private IEnumerator WindmillCoroutine()
+    {
+        yield return new WaitForSeconds(windmill.delay);
+
+        ResourcesHandler.energy += windmill.generation * windmill.qnt;
+
+        StartCoroutine(WindmillCoroutine());
+    }
+
+    #endregion
 
     public Machine GetMachineFromResource(Resource resource)
     {

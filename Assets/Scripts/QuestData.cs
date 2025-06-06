@@ -4,6 +4,8 @@ using UnityEngine;
 public enum QuestType
 {
     CollectResources,
+    HaveMachines,
+    ReachMoney
 }
 
 public enum QuestRewardType
@@ -25,6 +27,8 @@ public class QuestData
 
     [Header("POR TIPO")]
     public ResourceQuest resourceQuest;
+    public MachineQuest machineQuest;
+    public MoneyQuest moneyQuest;
 
     [Header("POR RECOMPENSA")]
     public MoneyReward moneyReward;
@@ -37,6 +41,19 @@ public class QuestData
     {
         public Resource resourceNeeded;
         public int neededAmount;
+    }
+
+    [Serializable]
+    public struct MachineQuest
+    {
+        public string machineNeededName;
+        public int neededAmount;
+    }
+
+    [Serializable]
+    public struct MoneyQuest
+    {
+        public int moneyAmount;
     }
 
     //RECOMPENSAS

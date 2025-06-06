@@ -17,7 +17,8 @@ public class NegociationsHandler : MonoBehaviour
     {
         {Resource.Carvão, 1},
         {Resource.Ferro, 3},
-        {Resource.Petróleo, 10}
+        {Resource.Petróleo, 10},
+        {Resource.BarraDeFerro, 15 }
     };
 
     public void Sell(bool sellAll)
@@ -57,7 +58,7 @@ public class NegociationsHandler : MonoBehaviour
         }
         else
         {
-            StartCoroutine(HUDHandler.main.FlashFeedback());
+            StartCoroutine(HUDHandler.main.FlashStoreFeedback());
         }
     }
 

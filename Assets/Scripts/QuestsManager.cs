@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class QuestsManager : MonoBehaviour
 {
@@ -20,13 +21,24 @@ public class QuestsManager : MonoBehaviour
         main = this;
     }
 
+    private void Start()
+    {
+        foreach (QuestData quest in availableQuests)
+        {
+            AddQuest(quest);
+        }
+    }
+
     private void Update()
     {
         foreach (QuestData quest in activeQuests)
         {
+            if (quest.isCompleted) continue;
+
             if (CheckIfCompleted(quest))
             {
                 quest.isCompleted = true;
+                quest.questBar.GetComponent<Button>().interactable = true;
             }
         }
 
@@ -38,12 +50,11 @@ public class QuestsManager : MonoBehaviour
     }
 
     [ContextMenu("ADICIONAR QUEST")]
-    public void AddQuest()
+    public void AddQuest(QuestData quest)
     {
         if (activeQuests.Count >= 7) return;
 
-        activeQuests.Add(availableQuests[Random.Range(0, availableQuests.Count)]); //SELECIONA UMA QUEST ALEATORIA
-        QuestData quest = activeQuests[0]; //PEGA A PRIMEIRA QUEST ATIVA
+        activeQuests.Add(quest); 
         GameObject questBar = Instantiate(questBarPF, limiter);
         quest.questBar = questBar;
         questBar.GetComponent<QuestBar>().SetBar(quest);
@@ -59,7 +70,25 @@ public class QuestsManager : MonoBehaviour
                     return true;
                 }
 
-            break;
+                break;
+
+            case QuestType.HaveMachines:
+                Machine machine = (Machine)MachinesHandler.main.GetMachine(quest.machineQuest.machineNeededName);
+
+                if (machine.qnt >= quest.machineQuest.neededAmount)
+                {
+                    return true;
+                }
+
+                break;
+
+            case QuestType.ReachMoney:
+                if (ResourcesHandler.money >= quest.moneyQuest.moneyAmount)
+                {
+                    return true;
+                }
+
+                break;
         }
 
         return false;

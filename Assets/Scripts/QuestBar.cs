@@ -4,22 +4,16 @@ using UnityEngine.UI;
 
 public class QuestBar : MonoBehaviour
 {  
-    private TextMeshProUGUI description, progress;
+    [SerializeField] private TextMeshProUGUI description, progress;
     private QuestData quest;
     private bool wasColorSet;
-
-    private void Awake()
-    {
-        description = transform.Find("Description").GetComponent<TextMeshProUGUI>();
-        progress = transform.Find("Progress").GetComponent<TextMeshProUGUI>();
-    }
 
     public void SetBar(QuestData quest)
     {
         this.quest = quest;
 
         description.text = quest.description;
-        progress.text = ResourcesHandler.main.GetResource(quest.resourceQuest.resourceNeeded) + " / " + quest.resourceQuest.neededAmount;
+        DefineProgress();
     }
 
     public void CallQuestCompleted()
@@ -39,8 +33,31 @@ public class QuestBar : MonoBehaviour
         }
         else
         {
-            progress.text = ResourcesHandler.main.GetResource(quest.resourceQuest.resourceNeeded) + " / " + quest.resourceQuest.neededAmount;
+            DefineProgress();
         }
+    }
+
+    private void DefineProgress()
+    {
+        switch (quest.type) 
+        {
+            case QuestType.CollectResources:
+                progress.text = ResourcesHandler.main.GetResource(quest.resourceQuest.resourceNeeded) + "/" + quest.resourceQuest.neededAmount;
+
+                break;
+
+            case QuestType.HaveMachines:
+                Machine machine = (Machine)MachinesHandler.main.GetMachine(quest.machineQuest.machineNeededName);
+                progress.text = machine.qnt + "/" + quest.machineQuest.neededAmount;
+
+                break;
+
+            case QuestType.ReachMoney:
+                progress.text = ResourcesHandler.money + "/" + quest.moneyQuest.moneyAmount;
+
+                break;
+        }
+
     }
 
 

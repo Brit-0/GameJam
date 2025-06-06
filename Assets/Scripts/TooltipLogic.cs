@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TooltipLogic : MonoBehaviour
@@ -26,6 +27,15 @@ public class TooltipLogic : MonoBehaviour
         TextMeshProUGUI GtipLbl = tipPanel.transform.Find("GTipLbl").GetComponent<TextMeshProUGUI>();  
         GtipLbl.text = Regex.Replace(GtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.generation) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
 
+
+        tipPanel.SetActive(true);
+    }
+
+    public void ShowHelperTooltip()
+    {
+        Machine helper = (Machine)MachinesHandler.main.GetHelper(machineName);
+        TextMeshProUGUI tipLbl = tipPanel.transform.Find("TipLbl").GetComponent<TextMeshProUGUI>();
+        tipLbl.text = Regex.Replace(tipLbl.text, "[-+]?\\d+(\\,\\d+)?", (helper.co2Lvl * -1 * helper.qnt).ToString("0.0"));
 
         tipPanel.SetActive(true);
     }

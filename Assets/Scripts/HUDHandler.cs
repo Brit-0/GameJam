@@ -9,13 +9,16 @@ public class HUDHandler : MonoBehaviour
 
     [Header("LABELS")]
     [SerializeField] TextMeshProUGUI moneyLbl, coalLbl, ironLbl, oilLbl, energyLbl, ironBarLbl;
-    [SerializeField] TextMeshProUGUI feedbackLbl;
+    [SerializeField] GameObject feedbackPanel, storeFeedbackPanel;
     [Header("SLIDER")]
     [SerializeField] Slider cO2Slider;
     [Header("OVERLAY")]
     [SerializeField] GameObject heatOverlay;
     [Header("PARTICLES")]
     [SerializeField] ParticleSystem moneyParticle2;
+    [Header("CAPITALIST")]
+    [SerializeField] Animator capitalistAnimator;
+
     private float currentCO2, currentVelocity = 0;
 
     private void Awake()
@@ -30,6 +33,11 @@ public class HUDHandler : MonoBehaviour
         if (cO2Slider.value > 9.5f)
         {
             heatOverlay.GetComponent<UITweener>().AlphaFlick();
+
+            if (!TerrainLogic.main.isTornadoing)
+            {
+                TerrainLogic.main.Tornado();
+            }
         }
     }
 
@@ -62,9 +70,17 @@ public class HUDHandler : MonoBehaviour
         moneyParticle2.Play();
     }
 
+    public void CapitalistSmile()
+    {
+        capitalistAnimator.SetTrigger("Smile");
+        StartCoroutine(FlashFeedback("Está querendo me dizer alguma coisa?", 2f));
+    }
+
     public IEnumerator FlashError(Machine machine)
     {
-        GameObject errorIcon = machine.buyable.transform.Find("ErrorIcon").gameObject; 
+        GameObject errorIcon = machine.buyable.transform.Find("ErrorIcon").gameObject;
+
+        if (errorIcon.activeInHierarchy) yield break;
     
         errorIcon.SetActive(true);
 
@@ -73,14 +89,30 @@ public class HUDHandler : MonoBehaviour
         errorIcon.SetActive(false);
     }
 
-    public IEnumerator FlashFeedback()
+    public IEnumerator FlashStoreFeedback()
     {
-        feedbackLbl.gameObject.SetActive(true);
+        if (storeFeedbackPanel.activeInHierarchy) yield break;
+
+        storeFeedbackPanel.SetActive(true);
 
         yield return new WaitForSeconds(2f);
 
-        feedbackLbl.gameObject.SetActive(false);
+        storeFeedbackPanel.SetActive(false);
     }
+
+    public IEnumerator FlashFeedback(string feedback, float duration)
+    {
+        if (feedbackPanel.activeInHierarchy) yield break;
+
+        feedbackPanel.transform.Find("FBLbl").GetComponent<TextMeshProUGUI>().text = feedback;
+
+        feedbackPanel.SetActive(true);
+
+        yield return new WaitForSeconds(duration);
+
+        feedbackPanel.SetActive(false);
+    }
+
 
     public void FirstPurchaseUpdate(Machine machine)
     {
@@ -88,15 +120,4 @@ public class HUDHandler : MonoBehaviour
         machine.buyable.transform.Find("Quantity").gameObject.SetActive(true);
         machine.buyable.transform.Find("Tip").gameObject.SetActive(true);
     }
-
-    public void ShowEnergies(Machine machine)
-    {
-        GameObject toggles = GameObject.Find(machine.name).transform.Find("Toggles").gameObject;
-
-        if (toggles)
-        {
-            toggles.SetActive(true);
-        }
-    }
-
 }

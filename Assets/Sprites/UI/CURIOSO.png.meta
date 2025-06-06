@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 766629da03d14434087caab70668ef3c
+guid: 5e87f0c294decee43b23484d4cb8788d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -123,85 +123,85 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: botoes_0
+      name: CURIOSO_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5d5d2ca40fae72347ac736f5acb249bf
-      internalID: 2081684040
+      spriteID: 4b0e8ce46d240e1419778a4a84a0a73b
+      internalID: 1780755671
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: botoes_1
+      name: CURIOSO_1
       rect:
         serializedVersion: 2
-        x: 33
+        x: 128
         y: 0
-        width: 32
-        height: 32
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 96db48f44c5811149b0af2154192212e
-      internalID: 1011214464
+      spriteID: fc37fb97f6dafd243967ea13bb68481b
+      internalID: -128922088
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: botoes_2
+      name: CURIOSO_2
       rect:
         serializedVersion: 2
-        x: 64
+        x: 256
         y: 0
-        width: 32
-        height: 32
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 2, y: 2, z: 2, w: 2}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: adfb81a1e2f9b894db6f1c5865e0368c
-      internalID: 205068587
+      spriteID: ce610cf3d63b0a449b7a08a31fe669a0
+      internalID: 1916846309
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: botoes_3
+      name: CURIOSO_3
       rect:
         serializedVersion: 2
-        x: 96
+        x: 384
         y: 0
-        width: 32
-        height: 32
+        width: 128
+        height: 128
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 4, y: 2, z: 2, w: 2}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 17ae7565934421a4b8723dd4a01f7bc4
-      internalID: -738186951
+      spriteID: 8f87a99f97243754897be36ff4da3d30
+      internalID: 1375704894
       vertices: []
       indices: 
       edges: []
@@ -217,10 +217,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      botoes_0: 2081684040
-      botoes_1: 1011214464
-      botoes_2: 205068587
-      botoes_3: -738186951
+      CURIOSO_0: 1780755671
+      CURIOSO_1: -128922088
+      CURIOSO_2: 1916846309
+      CURIOSO_3: 1375704894
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
