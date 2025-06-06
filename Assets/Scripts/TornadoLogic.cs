@@ -24,10 +24,6 @@ public class TornadoLogic : MonoBehaviour
         ps = GetComponent<ParticleSystem>();
     }
 
-    private void Start()
-    {
-        TornadoLife();
-    }
 
     private void FixedUpdate()
     {
@@ -127,6 +123,7 @@ public class TornadoLogic : MonoBehaviour
         if (TerrainLogic.main.activeTornadoes.Count == 0)
         {
             TerrainLogic.main.isTornadoing = false;
+            HUDHandler.main.CapitalistDemon(false);
         }
         TerrainLogic.main.StartCoroutine(TerrainLogic.main.IncreaseTornadoCounter());
         Destroy(gameObject);

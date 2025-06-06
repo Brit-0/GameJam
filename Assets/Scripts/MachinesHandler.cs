@@ -90,6 +90,7 @@ public class MachinesHandler : MonoBehaviour
 
         if (ResourcesHandler.money >= machine.price) //COMPRA SUCEDIDA
         {
+            AudioManager.PlayAudio(AudioManager.main.buy);
             ResourcesHandler.money -= machine.price;
 
             if (!machine.alreadyBought) 

@@ -54,6 +54,7 @@ public class NegociationsHandler : MonoBehaviour
             ResourcesHandler.main.UpdateResource(resource, resourceAmount);
 
             ps.Play();
+            AudioManager.PlayAudio(AudioManager.main.sell, .7f);
             capitalistAnimator.SetTrigger("Sell");
         }
         else

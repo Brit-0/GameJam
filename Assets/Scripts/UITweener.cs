@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class UITweener : MonoBehaviour
 {
@@ -54,9 +52,17 @@ public class UITweener : MonoBehaviour
         LeanTween.color(rectTrans, color, speed).setLoopPingPong(1);
     }
 
-    public void FadeAlpha(float toAlpha, float time)
+    public void FadeAlpha(float toAlpha, float time, bool fadeOut = default(bool))
     {
-        LeanTween.alpha(rectTrans, toAlpha, time);
+        var seq = LeanTween.sequence();
+        seq.append(LeanTween.alpha(rectTrans, toAlpha, time));
+        seq.append(() => 
+        {
+            if (fadeOut)
+            {
+                rectTrans.gameObject.SetActive(false);
+            }
+        });
     }
     
   

@@ -13,6 +13,7 @@ public class TerrainLogic : MonoBehaviour
     [Header("TILES")]
     [SerializeField] private TileBase grassTile;
     [SerializeField] private List<TileBase> treesTiles;
+    [SerializeField] private TileBase explosionTile;
 
     [Header("TORNADO")]
     [SerializeField] private GameObject tornadoPF;
@@ -21,7 +22,6 @@ public class TerrainLogic : MonoBehaviour
     public bool isTornadoing;
     public int tornadoCounter;
     public int numOfTornadoes = 1;
-    public bool isWaiting;
 
     public static TileBase currentTile;
     private Vector3Int mouseTile, lastMouseTile;
@@ -60,6 +60,8 @@ public class TerrainLogic : MonoBehaviour
 
         tm.SetTile(clickedTilepos, currentTile);
 
+        AudioManager.PlayAudio(AudioManager.main.construction, .5f);
+
         StartCoroutine(CompressCounter());
 
         Machine machine = (Machine)MachinesHandler.main.GetMachine(currentTile.name);
@@ -84,7 +86,8 @@ public class TerrainLogic : MonoBehaviour
 
         if (clickedTile == grassTile) return;
 
-        tm.SetTile(clickedTilepos, grassTile);
+        AudioManager.PlayAudio(AudioManager.main.explosion, .5f);
+        StartCoroutine(Explosion(clickedTilepos));
 
         Machine machine = (Machine)MachinesHandler.main.GetMachine(clickedTile.name);
 
@@ -100,13 +103,23 @@ public class TerrainLogic : MonoBehaviour
         isDemolishing = false;
     }
 
+    private IEnumerator Explosion(Vector3Int cell)
+    {
+        tm.SetTile(cell, explosionTile);
+
+        yield return new WaitForSeconds(.5f);
+
+        tm.SetTile(cell, grassTile);
+    }
+
     private void ChopTile()
     {
         Vector3Int clickedTilepos = tm.WorldToCell(terrainCam.ScreenToWorldPoint(Input.mousePosition));
         TileBase clickedTile = tm.GetTile(clickedTilepos);
 
         if (!treesTiles.Contains(clickedTile)) return;
-        
+
+        AudioManager.PlayAudio(AudioManager.main.chop);
         tm.SetTile(clickedTilepos, grassTile);
 
         StartCoroutine(CompressCounter());
@@ -116,7 +129,7 @@ public class TerrainLogic : MonoBehaviour
 
     private IEnumerator CompressCounter()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1.5f);
 
         Cursor.SetCursor(default, Vector2.zero, CursorMode.ForceSoftware);
         CameraController.main.CompressViewport();
@@ -128,7 +141,6 @@ public class TerrainLogic : MonoBehaviour
 
         if (!isTornadoing)
         {
-            isWaiting = false;
             tornadoCounter++;
             numOfTornadoes = (int)Mathf.Pow(2, tornadoCounter);
         }
@@ -138,8 +150,11 @@ public class TerrainLogic : MonoBehaviour
     [ContextMenu("TORNADO")]
     public void Tornado()
     {
+        HUDHandler.main.CapitalistDemon(true);
+
         for (int i = 0; i < numOfTornadoes; i++)
-        { 
+        {
+
             isTornadoing = true;
 
             if (tornadoCounter == 0)

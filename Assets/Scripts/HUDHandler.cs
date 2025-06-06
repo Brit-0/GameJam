@@ -76,6 +76,11 @@ public class HUDHandler : MonoBehaviour
         StartCoroutine(FlashFeedback("Está querendo me dizer alguma coisa?", 2f));
     }
 
+    public void CapitalistDemon(bool active)
+    {
+        capitalistAnimator.SetBool("Demon", active);
+    }
+
     public IEnumerator FlashError(Machine machine)
     {
         GameObject errorIcon = machine.buyable.transform.Find("ErrorIcon").gameObject;
