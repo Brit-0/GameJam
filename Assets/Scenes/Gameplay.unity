@@ -2215,7 +2215,7 @@ MonoBehaviour:
     moneyReward:
       moneyAmount: 50
     machineReward:
-      machineName: WindMill
+      machineName: Windmill
   activeQuests: []
   questBarPF: {fileID: 2023464635601174252, guid: a2989208b3e4192489e8693606be5df3, type: 3}
   limiter: {fileID: 1362090485}
