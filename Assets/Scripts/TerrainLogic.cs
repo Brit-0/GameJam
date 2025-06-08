@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Schema;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,13 +9,15 @@ public class TerrainLogic : MonoBehaviour
 {
     public static TerrainLogic main;
 
+    public Tilemap tm;
     [SerializeField] private Camera terrainCam;
-    [SerializeField] private Tilemap tm;
 
     [Header("TILES")]
     [SerializeField] private TileBase grassTile;
     [SerializeField] private List<TileBase> treesTiles;
     [SerializeField] private TileBase explosionTile;
+    [SerializeField] private TileBase smallReserveTile;
+    [SerializeField] private TileBase[] grandReserveTiles;
 
     [Header("TORNADO")]
     [SerializeField] private GameObject tornadoPF;
@@ -51,6 +55,8 @@ public class TerrainLogic : MonoBehaviour
         }
     }
 
+    #region BUYS
+
     private void BuildMachine()
     {
         Vector3Int clickedTilepos = tm.WorldToCell(terrainCam.ScreenToWorldPoint(Input.mousePosition));
@@ -60,21 +66,22 @@ public class TerrainLogic : MonoBehaviour
 
         tm.SetTile(clickedTilepos, currentTile);
 
-        AudioManager.PlayAudio(AudioManager.main.construction, .5f);
+        AudioManager.PlayAudio(AudioManager.main.construction);
 
         StartCoroutine(CompressCounter());
 
         Machine machine = (Machine)MachinesHandler.main.GetMachine(currentTile.name);
+        machine ??= (Machine)MachinesHandler.main.GetHelper(currentTile.name);
 
-        if (machine == null)
+        if (machine.name == "SmallReserve")
         {
-            machine = (Machine)MachinesHandler.main.GetHelper(currentTile.name);
+            CheckCombine(clickedTilepos, machine);
         }
 
         machine.qnt++; //AUMENTA A CONTAGEM DESSA MÁQUINA
 
         HUDHandler.main.UpdateQuantities(machine);
-        ResourcesHandler.co2LvlIncreaser += machine.co2Lvl; //ADICIONA A EMISSÃO DE CARBOONO
+        ResourcesHandler.co2Lvl += machine.co2Lvl; //ADICIONA A EMISSÃO DE CARBOONO
 
         currentTile = null;
     }
@@ -90,12 +97,13 @@ public class TerrainLogic : MonoBehaviour
         StartCoroutine(Explosion(clickedTilepos));
 
         Machine machine = (Machine)MachinesHandler.main.GetMachine(clickedTile.name);
+        machine ??= (Machine)MachinesHandler.main.GetHelper(clickedTile.name);
 
         if (machine != null)
         {
             machine.qnt--;
             HUDHandler.main.UpdateQuantities(machine);
-            ResourcesHandler.co2LvlIncreaser -= machine.co2Lvl;
+            ResourcesHandler.co2Lvl -= machine.co2Lvl;
         }
 
         StartCoroutine(CompressCounter());
@@ -114,6 +122,11 @@ public class TerrainLogic : MonoBehaviour
 
     private void ChopTile()
     {
+        if (!tm.ContainsTile(treesTiles[0]) && tm.ContainsTile(treesTiles[1]) && tm.ContainsTile(treesTiles[2]))
+        {
+            StartCoroutine(HUDHandler.main.FlashFeedback(CapitalistDialog.SelectDialog(CapitalistDialog.chopWithoutTrees)));
+        }
+
         Vector3Int clickedTilepos = tm.WorldToCell(terrainCam.ScreenToWorldPoint(Input.mousePosition));
         TileBase clickedTile = tm.GetTile(clickedTilepos);
 
@@ -124,16 +137,12 @@ public class TerrainLogic : MonoBehaviour
 
         StartCoroutine(CompressCounter());
 
-        isChopping = true;
+        isChopping = false;
     }
 
-    private IEnumerator CompressCounter()
-    {
-        yield return new WaitForSeconds(1.5f);
+    #endregion
 
-        Cursor.SetCursor(default, Vector2.zero, CursorMode.ForceSoftware);
-        CameraController.main.CompressViewport();
-    }
+    #region TORNADO
 
     public IEnumerator IncreaseTornadoCounter()
     {
@@ -150,8 +159,6 @@ public class TerrainLogic : MonoBehaviour
     [ContextMenu("TORNADO")]
     public void Tornado()
     {
-        HUDHandler.main.CapitalistDemon(true);
-
         for (int i = 0; i < numOfTornadoes; i++)
         {
 
@@ -209,4 +216,67 @@ public class TerrainLogic : MonoBehaviour
         }
     }
 
+    #endregion
+
+    private void CheckCombine(Vector3Int cell, Machine machine)
+    {
+
+        Vector3Int[] directionsLeftRight = new Vector3Int[2]
+        {
+           Vector3Int.right,
+           Vector3Int.left,
+        };
+
+        Vector3Int[] directionsUpDown = new Vector3Int[2]
+        {
+           Vector3Int.up,
+           Vector3Int.down,
+        };
+
+        for (int i = 0; i < 2; i++)
+        {
+            for (int k = 0; k < 2; k++)
+            {
+                if (tm.GetTile(cell + directionsLeftRight[i]) == machine.tile)
+                {
+                    if (tm.GetTile(cell + directionsUpDown[k]) == machine.tile)
+                    {
+                        if (tm.GetTile(cell + directionsLeftRight[i] + directionsUpDown[k]) == machine.tile)
+                        {
+                            int xMin = Mathf.Min(cell.x, (cell + directionsLeftRight[i]).x);
+                            int yMin = Mathf.Min(cell.y, (cell + directionsUpDown[k]).y);
+
+                            BoundsInt bounds = new BoundsInt(xMin, yMin, cell.z, 2, 2, 1);
+
+                            tm.SetTilesBlock(bounds, grandReserveTiles);
+
+                            machine.qnt -= 4;
+                            HUDHandler.main.UpdateQuantities(machine);
+
+                            Machine newMachine = (Machine)MachinesHandler.main.GetHelper("GrandReserve");
+                            newMachine.qnt++;
+                            newMachine.bounds = bounds;
+                            HUDHandler.main.UpdateQuantities(newMachine);
+
+                            if (newMachine.qnt == 1)
+                            {
+                                HUDHandler.main.UnlockPage();
+                            }
+
+                            ResourcesHandler.co2Lvl -= machine.co2Lvl;
+                            ResourcesHandler.co2Lvl += newMachine.co2Lvl;
+                        }
+                    }
+                }
+            }  
+        }
+    }
+
+    private IEnumerator CompressCounter()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        Cursor.SetCursor(default, Vector2.zero, CursorMode.ForceSoftware);
+        CameraController.main.CompressViewport();
+    }
 }

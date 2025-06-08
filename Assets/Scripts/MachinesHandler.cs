@@ -19,6 +19,9 @@ public class Machine
     public int energyWaste;
     [Header("POLUIÇÃO")]
     public int co2Lvl;
+    [Header("MÁQUINA GRANDE")]
+    public bool isBigMachine;
+    public BoundsInt bounds;
     [Header("REFERÊNCIAS")]
     public TileBase tile;
     public GameObject buyable;
@@ -36,9 +39,9 @@ public class MachinesHandler : MonoBehaviour
     [SerializeField] private List<Machine> allMachines;
     [SerializeField] private List<Machine> allHelpers;
 
-    private int currentBuyableIndex, currentHelperIndex;
-    private Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant, solarPanel, windmill;
-    private Machine smallReserve;
+    [HideInInspector]
+    public Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant, solarPanel, windmill;
+    private Machine smallReserve, grandReserve;
     private int dinamitePrice = 50, axePrice = 30;
 
     private void Awake()
@@ -56,7 +59,8 @@ public class MachinesHandler : MonoBehaviour
         windmill = (Machine)GetMachine("Windmill");
 
         //AUXILIARES
-        smallReserve = (Machine)GetMachine("SmallReserve");
+        smallReserve = (Machine)GetHelper("SmallReserve");
+        grandReserve = (Machine)GetHelper("GrandReserve");
     }
 
     public object GetMachine(string machineName)
@@ -83,7 +87,6 @@ public class MachinesHandler : MonoBehaviour
         return null;
     }
 
-
     public void BuyMachine(string machineName)
     {
         Machine machine = (Machine)GetMachine(machineName);
@@ -92,6 +95,7 @@ public class MachinesHandler : MonoBehaviour
         {
             AudioManager.PlayAudio(AudioManager.main.buy);
             ResourcesHandler.money -= machine.price;
+            CameraController.main.StartCoroutine(CameraController.main.BlockPurchases());
 
             if (!machine.alreadyBought) 
             {
@@ -101,7 +105,6 @@ public class MachinesHandler : MonoBehaviour
 
                 HUDHandler.main.FirstPurchaseUpdate(machine);
 
-                currentBuyableIndex++; //PEGAR PRÓXIMO DESBLOQUEÁVEL E 
                 //ShowNextBuyable(); //MOSTRAR ELE
 
                 if (machine.price == 0)
@@ -141,8 +144,6 @@ public class MachinesHandler : MonoBehaviour
                 helper.alreadyBought = true;
 
                 HUDHandler.main.FirstPurchaseUpdate(helper);
-
-                currentHelperIndex++;
 
                 StartCoroutine(CameraController.main.ExpandViewport("Build", 1f));
             }
@@ -197,18 +198,9 @@ public class MachinesHandler : MonoBehaviour
         }
         else
         {
-            StartCoroutine(HUDHandler.main.FlashFeedback("Precisa de mais " + (dinamitePrice - ResourcesHandler.money) + " reais", 2f));
+            StartCoroutine(HUDHandler.main.FlashFeedback("Precisa de mais " + (axePrice - ResourcesHandler.money) + " reais", 2f));
         }
     }
-
-    private void ShowNextBuyable()
-    {
-        print(currentBuyableIndex);
-        if (currentBuyableIndex >= allMachines.Count) return;
-
-        allMachines[currentBuyableIndex].buyable.SetActive(true);
-    }
-
 
     #region Coroutines
     private IEnumerator CoalExtractorCoroutine()
@@ -244,7 +236,7 @@ public class MachinesHandler : MonoBehaviour
         if (ResourcesHandler.energy >= oilExtractor.energyWaste * oilExtractor.qnt)
         {
             ResourcesHandler.energy -= oilExtractor.energyWaste * oilExtractor.qnt;
-            ResourcesHandler.oil += oilExtractor.generation;
+            ResourcesHandler.oil += oilExtractor.generation * oilExtractor.qnt;
         }
         else
         {

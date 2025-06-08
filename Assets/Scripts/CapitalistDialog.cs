@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public static class CapitalistDialog
 {
@@ -17,7 +18,12 @@ public static class CapitalistDialog
 
     public static List<string> failedBuyHelper = new()
     {
-        "Olha só! O falso milhonário tentando virar dono da natureza. Que piada..."
+        "Olha só! O falso milionário tentando virar dono da natureza. Que piada..."
+    };
+
+    public static List<string> chopWithoutTrees = new()
+    {
+        "Você acabou com todas as árvores... Isso que é um prodígio de verdade!"
     };
 
     public static string SelectDialog(List<string> dialogList)

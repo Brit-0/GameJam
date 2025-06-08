@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     public static CameraController main;
 
     //GENERAL
-    [SerializeField] private GameObject buildBlocker, destroyBlocker, chopBlocker;
+    [SerializeField] private GameObject buildBlocker, destroyBlocker, chopBlocker, unlockBlocker;
 
     //DRAG
     private Vector3 originPos, difference, targetPosition;
@@ -49,6 +49,15 @@ public class CameraController : MonoBehaviour
         isDragging = ctx.started || ctx.performed;
     }
 
+    public IEnumerator BlockPurchases()
+    {
+        unlockBlocker.SetActive(true);
+
+        yield return new WaitForSeconds(1f);
+
+        unlockBlocker.SetActive(false);
+    }
+
     public IEnumerator ExpandViewport(string purchaseType, float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -69,7 +78,6 @@ public class CameraController : MonoBehaviour
         {
             chopBlocker.SetActive(true);
         }
-        
     }
 
     public void CompressViewport()

@@ -1,24 +1,23 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class MenuHandler : MonoBehaviour
 {
     private Animator animator;
-    private GameObject logo, startLbl, blackoutPanel;
+    private GameObject logo, blackoutPanel;
+    private bool canStart;  
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        logo = transform.Find("Logo").gameObject;
-        startLbl = transform.Find("StartLbl").gameObject;
+        logo = transform.Find("Logo").gameObject;     
         blackoutPanel = transform.Find("BlackoutPanel").gameObject;
     }
 
     private void Start()
     {
+        AudioManager.StartMusic(AudioManager.main.ambience);
         animator.SetTrigger("Loaded");
     }
 
@@ -27,8 +26,15 @@ public class MenuHandler : MonoBehaviour
         logo.GetComponent<UITweener>().FadeAlpha(1f, 1.8f);
     }
 
+    public void DefineCanStart()
+    {
+        canStart = true;
+    }
+
     public void StartInitiateCoroutine()
     {
+        if (!canStart) return;
+
         StartCoroutine(StartGameTransition());
     }
 

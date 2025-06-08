@@ -22,7 +22,7 @@ public class TooltipLogic : MonoBehaviour
 
         TextMeshProUGUI EtipLbl = tipPanel.transform.Find("ETipLbl").GetComponent<TextMeshProUGUI>();
         EtipLbl.text = Regex.Replace(EtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.energyWaste) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
-  
+
 
         TextMeshProUGUI GtipLbl = tipPanel.transform.Find("GTipLbl").GetComponent<TextMeshProUGUI>();  
         GtipLbl.text = Regex.Replace(GtipLbl.text, "[-+]?\\d+(\\,\\d+)?", (Mathf.Round(machine.generation) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));

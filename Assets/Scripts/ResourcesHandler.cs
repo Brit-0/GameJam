@@ -21,24 +21,18 @@ public class ResourcesHandler : MonoBehaviour
     public static int energy;
     public static int ironBar;
 
-    public static int co2LvlIncreaser, co2LvlDecreaser, co2Lvl;
+    public static int co2Lvl;
 
     private void Awake()
     {
         main = this;
-    }
-
-    public void GetMoney()
-    {
-        money++;    
-    }
-
-    private void Update()
-    {
-        if (Input.GetKey(KeyCode.Q) && Input.GetKeyDown(KeyCode.E))
-        {
-            money += 100;
-        }
+        money = 0;
+        coal = 0;
+        iron = 0;
+        oil = 0;
+        energy = 0;
+        ironBar = 0;
+        co2Lvl = 0;
     }
 
     public int GetResource(Resource resource)

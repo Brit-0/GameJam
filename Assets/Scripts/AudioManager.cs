@@ -4,7 +4,7 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager main;
 
-    private static AudioSource audioSource, musicSource;
+    private static AudioSource audioSource, musicSource, clickSource;
 
     [Header("SOUND EFFECTS")]
     public AudioClip buy;
@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
         main = this;
         audioSource = GetComponent<AudioSource>();
         musicSource = transform.Find("MusicHandler").GetComponent<AudioSource>();
+        clickSource = transform.Find("ClickHandler").GetComponent<AudioSource>();
     }
 
     public static void PlayAudio(AudioClip clip, float volume = 1f)
@@ -34,9 +35,9 @@ public class AudioManager : MonoBehaviour
 
     public static void PlayOverlayAudio(AudioClip clip, float volume = 1f)
     {
-        audioSource.clip = clip;
-        audioSource.volume = volume;
-        audioSource.PlayOneShot(clip);
+        clickSource.clip = clip;
+        clickSource.volume = volume;
+        clickSource.Play();
     }
 
     public static void StartMusic(AudioClip clip, float volume = 1f)

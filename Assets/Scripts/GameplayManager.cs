@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameplayManager : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class GameplayManager : MonoBehaviour
     {
         StartCoroutine(DropBriefcase());
         blackoutPanel.GetComponent<UITweener>().FadeAlpha(0f, 2f, true);
-        AudioManager.StartMusic(AudioManager.main.ambience, .3f);
+        AudioManager.StartMusic(AudioManager.main.music, .3f);
     }
 
     private void Update()
@@ -29,6 +30,16 @@ public class GameplayManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             AudioManager.PlayOverlayAudio(AudioManager.main.click, .7f);
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.L) && Input.GetKeyDown(KeyCode.M))
+        {
+            ResourcesHandler.money += 100;
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene("Menu");
         }
     }
 

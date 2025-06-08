@@ -32,6 +32,7 @@ public class TornadoLogic : MonoBehaviour
         if (!finished)
         {
             Move();
+            HUDHandler.main.CapitalistDemon(true);
         } else
         {
             Fade();
@@ -76,7 +77,6 @@ public class TornadoLogic : MonoBehaviour
             if (!tm.HasTile(cell)) return;
 
             Machine machine = (Machine)MachinesHandler.main.GetMachine(tm.GetTile(cell).name);
-
             machine ??= (Machine)MachinesHandler.main.GetHelper(tm.GetTile(cell).name);
 
             tm.SetTile(cell, destroyedTile);
@@ -85,18 +85,11 @@ public class TornadoLogic : MonoBehaviour
             {
                 machine.qnt--;
                 HUDHandler.main.UpdateQuantities(machine);
-                ResourcesHandler.co2LvlIncreaser -= machine.co2Lvl;
+                ResourcesHandler.co2Lvl -= machine.co2Lvl;
             }
         }
 
         TerrainLogic.main.StartCoroutine(TerrainLogic.main.RestoreTiles(cellsToDestroy));
-    }
-    
-    private IEnumerator TornadoLife()
-    {
-        yield return new WaitForSeconds(15f);
-
-        finished = true;
     }
 
     private void Fade()
