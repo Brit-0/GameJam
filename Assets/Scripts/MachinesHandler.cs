@@ -14,14 +14,13 @@ public class Machine
     public int generation;
     public int delay;
     [Header("CONSUMO")]
-    public Resource resourceConsumed;
     public int consumption;
     public int energyWaste;
     [Header("POLUIÇÃO")]
     public int co2Lvl;
     [Header("MÁQUINA GRANDE")]
+    public bool isCombinable;
     public bool isBigMachine;
-    public BoundsInt bounds;
     [Header("REFERÊNCIAS")]
     public TileBase tile;
     public GameObject buyable;
@@ -34,6 +33,8 @@ public class MachinesHandler : MonoBehaviour
 {
     public static MachinesHandler main;
 
+    [SerializeField] Tilemap tm;
+
     [SerializeField] Texture2D dinamiteIcon, axeIcon;
 
     [SerializeField] private List<Machine> allMachines;
@@ -41,8 +42,10 @@ public class MachinesHandler : MonoBehaviour
 
     [HideInInspector]
     public Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant, solarPanel, windmill;
-    private Machine smallReserve, grandReserve;
-    private int dinamitePrice = 50, axePrice = 30;
+    public Machine grandMetalIndustry, grandPowerPlant;
+    [HideInInspector]
+    public Machine smallReserve, grandReserve;
+    private const int dinamitePrice = 50, axePrice = 30;
 
     private void Awake()
     {
@@ -58,16 +61,20 @@ public class MachinesHandler : MonoBehaviour
         solarPanel = (Machine)GetMachine("SolarPanel");
         windmill = (Machine)GetMachine("Windmill");
 
+        grandMetalIndustry = (Machine)GetMachine("GrandMetalIndustry");
+        grandPowerPlant = (Machine)GetMachine("GrandPowerPlant");
+
         //AUXILIARES
         smallReserve = (Machine)GetHelper("SmallReserve");
         grandReserve = (Machine)GetHelper("GrandReserve");
     }
 
+    #region GET
     public object GetMachine(string machineName)
     {
         foreach (Machine machine in allMachines)
         {
-            if (machine.name == machineName)
+            if (machineName.Contains(machine.name))
             {
                 return machine;
             }
@@ -79,13 +86,17 @@ public class MachinesHandler : MonoBehaviour
     {
         foreach (Machine helper in allHelpers)
         {
-            if (helper.name == helperName)
+            if (helperName.Contains(helper.name))
             {
                 return helper;
             }
         }
         return null;
     }
+
+    #endregion
+
+    #region BUYS
 
     public void BuyMachine(string machineName)
     {
@@ -116,7 +127,10 @@ public class MachinesHandler : MonoBehaviour
             }
             else
             {
-                machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+                if (machine.price < 2500)
+                {
+                    machine.price = Mathf.RoundToInt(machine.price * 1.5f / 10) * 10;
+                }
                 StartCoroutine(CameraController.main.ExpandViewport("Build", 0f));
             }
 
@@ -137,7 +151,9 @@ public class MachinesHandler : MonoBehaviour
 
         if (ResourcesHandler.money >= helper.price)
         {
+            AudioManager.PlayAudio(AudioManager.main.buy);
             ResourcesHandler.money -= helper.price;
+            CameraController.main.StartCoroutine(CameraController.main.BlockPurchases());
 
             if (!helper.alreadyBought)
             {
@@ -149,7 +165,10 @@ public class MachinesHandler : MonoBehaviour
             }
             else
             {
-                helper.price = Mathf.RoundToInt(helper.price * 1.5f / 10) * 10;
+                if (helper.price < 1500)
+                {
+                    helper.price = Mathf.RoundToInt(helper.price * 1.5f / 10) * 10;
+                }
                 StartCoroutine(CameraController.main.ExpandViewport("Build", 0f));
             }
 
@@ -202,6 +221,8 @@ public class MachinesHandler : MonoBehaviour
         }
     }
 
+    #endregion
+
     #region Coroutines
     private IEnumerator CoalExtractorCoroutine()
     {
@@ -250,7 +271,7 @@ public class MachinesHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(thermalPowerPlant.delay);
 
-        if (ResourcesHandler.coal >= thermalPowerPlant.qnt)
+        if (ResourcesHandler.coal >= thermalPowerPlant.qnt * thermalPowerPlant.consumption)
         {
             ResourcesHandler.coal -= thermalPowerPlant.qnt * thermalPowerPlant.consumption;
             ResourcesHandler.energy += thermalPowerPlant.qnt * thermalPowerPlant.generation;
@@ -263,11 +284,28 @@ public class MachinesHandler : MonoBehaviour
         StartCoroutine(ThermalPowerPlantCoroutine());
     }
 
+    public IEnumerator GrandPowerPlantCoroutine()
+    {
+        yield return new WaitForSeconds(grandPowerPlant.delay);
+
+        if (ResourcesHandler.coal >= grandPowerPlant.qnt * grandPowerPlant.consumption)
+        {
+            ResourcesHandler.coal -= grandPowerPlant.qnt * grandPowerPlant.consumption;
+            ResourcesHandler.energy += grandPowerPlant.qnt * grandPowerPlant.generation;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(grandPowerPlant));
+        }
+
+        StartCoroutine(GrandPowerPlantCoroutine());
+    }
+
     private IEnumerator SmallMetalIndustryCoroutine()
     {
         yield return new WaitForSeconds(smallMetalIndustry.delay);
 
-        if (ResourcesHandler.iron >= smallMetalIndustry.consumption * smallMetalIndustry.qnt)
+        if (ResourcesHandler.iron >= smallMetalIndustry.consumption * smallMetalIndustry.qnt && ResourcesHandler.energy >= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt)
         {
             ResourcesHandler.iron -= smallMetalIndustry.consumption * smallMetalIndustry.qnt;
             ResourcesHandler.energy -= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt;
@@ -280,6 +318,25 @@ public class MachinesHandler : MonoBehaviour
         }
 
         StartCoroutine(SmallMetalIndustryCoroutine());
+    }
+
+    public IEnumerator GrandMetalIndustryCoroutine()
+    {
+        yield return new WaitForSeconds(grandMetalIndustry.delay);
+
+        if (ResourcesHandler.iron >= grandMetalIndustry.consumption * grandMetalIndustry.qnt && ResourcesHandler.energy >= grandMetalIndustry.energyWaste * grandMetalIndustry.qnt)
+        {
+            ResourcesHandler.iron -= grandMetalIndustry.consumption * grandMetalIndustry.qnt;
+            ResourcesHandler.energy -= grandMetalIndustry.energyWaste * grandMetalIndustry.qnt;
+
+            ResourcesHandler.ironBar += grandMetalIndustry.qnt * grandMetalIndustry.generation;
+        }
+        else
+        {
+            StartCoroutine(HUDHandler.main.FlashError(grandMetalIndustry));
+        }
+
+        StartCoroutine(GrandMetalIndustryCoroutine());
     }
 
     private IEnumerator OilPowerPlantCoroutine()
@@ -318,6 +375,7 @@ public class MachinesHandler : MonoBehaviour
     }
 
     #endregion
+
 
     public Machine GetMachineFromResource(Resource resource)
     {

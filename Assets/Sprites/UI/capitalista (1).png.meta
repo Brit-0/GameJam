@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 727f76e84372061438ab907a172db9cf
+guid: 8c3cad196a437b647906176585fce826
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 128
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -119,11 +119,24 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: capitalista_0
+      name: capitalista (1)_0
       rect:
         serializedVersion: 2
         x: 0
@@ -137,14 +150,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 56671a69ce7c18b4da6d46a4d10c665a
-      internalID: 2140577257
+      spriteID: 7bcfd029c706d7a47877932a8b433ea5
+      internalID: -394316188
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: capitalista_1
+      name: capitalista (1)_1
       rect:
         serializedVersion: 2
         x: 64
@@ -158,14 +171,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4dd6ef983b0a1084fb1d71fbf8606cc8
-      internalID: -659250645
+      spriteID: f04024d6a2d5f7f408bcbfec5d887825
+      internalID: -1761601020
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: capitalista_2
+      name: capitalista (1)_2
       rect:
         serializedVersion: 2
         x: 128
@@ -179,14 +192,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e066a2644fc061345b249547a1d226c7
-      internalID: 318082233
+      spriteID: 276ceabd8d710a04bb9558434d39edca
+      internalID: 645382473
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: capitalista_3
+      name: capitalista (1)_3
       rect:
         serializedVersion: 2
         x: 192
@@ -200,8 +213,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1232adb5a7c26bc4f81e154e2a55ab5e
-      internalID: 289409462
+      spriteID: aed91bec0c8585c478ecdaef01527992
+      internalID: -179465591
       vertices: []
       indices: 
       edges: []
@@ -217,10 +230,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      capitalista_0: 2140577257
-      capitalista_1: -659250645
-      capitalista_2: 318082233
-      capitalista_3: 289409462
+      capitalista (1)_0: -394316188
+      capitalista (1)_1: -1761601020
+      capitalista (1)_2: 645382473
+      capitalista (1)_3: -179465591
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

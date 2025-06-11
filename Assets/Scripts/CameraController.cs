@@ -45,7 +45,7 @@ public class CameraController : MonoBehaviour
 
     public void OnDrag(InputAction.CallbackContext ctx)
     {
-        if (ctx.started) originPos = GetMousePosition;
+        if (ctx.started && terrainCam.pixelRect.Contains(Input.mousePosition)) originPos = GetMousePosition;
         isDragging = ctx.started || ctx.performed;
     }
 

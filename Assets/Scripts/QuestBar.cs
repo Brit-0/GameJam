@@ -48,6 +48,7 @@ public class QuestBar : MonoBehaviour
 
             case QuestType.HaveMachines:
                 Machine machine = (Machine)MachinesHandler.main.GetMachine(quest.machineQuest.machineNeededName);
+                machine ??= (Machine)MachinesHandler.main.GetHelper(quest.machineQuest.machineNeededName);
                 progress.text = machine.qnt + "/" + quest.machineQuest.neededAmount;
 
                 break;

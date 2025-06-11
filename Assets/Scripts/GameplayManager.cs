@@ -1,15 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class GameplayManager : MonoBehaviour
 {
+    [Header("MENU")]
+    [SerializeField] private GameObject quitPanel;
+
     [Header("TRANSIÇÃO")]
     [SerializeField] private GameObject blackoutPanel;
 
     [Header("MALETA")]
     [SerializeField] private GameObject briefcasePF;
+    [SerializeField] private GameObject rareBriefcasePF;
     [SerializeField] private List<Transform> briefcaseSpawnLocations;
     [SerializeField] private Transform briefcaseCanvas;
 
@@ -34,23 +39,52 @@ public class GameplayManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.L) && Input.GetKeyDown(KeyCode.M))
         {
-            ResourcesHandler.money += 100;
+            ResourcesHandler.money += 500;
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SceneManager.LoadScene("Menu");
+            if (quitPanel.activeInHierarchy)
+            {
+                quitPanel.GetComponent<UITweener>().CloseTween();
+            }
+            else
+            {
+                quitPanel.SetActive(true);
+                quitPanel.GetComponent<UITweener>().PopUpTween(1f);
+            }
         }
+    }
+
+    public void ResetGame()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     private IEnumerator DropBriefcase()
     {
         yield return new WaitForSeconds(30f);
 
+        GameObject pf;
+
+        if (Random.Range(1, 11) == 10)
+        {
+            pf = rareBriefcasePF;
+        }
+        else
+        {
+            pf = briefcasePF;
+        }
+
         if (Random.Range(0, 2) == 0)
         {
-            GameObject briefcase = 
-            Instantiate(briefcasePF, briefcaseSpawnLocations[Random.Range(0, briefcaseSpawnLocations.Count)].position, Quaternion.identity, briefcaseCanvas);
+            GameObject briefcase =
+            Instantiate(pf, briefcaseSpawnLocations[Random.Range(0, briefcaseSpawnLocations.Count)].position, Quaternion.identity, briefcaseCanvas);
 
             yield return new WaitForSeconds(4f);
 

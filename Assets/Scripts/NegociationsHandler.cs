@@ -55,11 +55,19 @@ public class NegociationsHandler : MonoBehaviour
 
             ps.Play();
             AudioManager.PlayAudio(AudioManager.main.sell, .7f);
-            capitalistAnimator.SetTrigger("Sell");
+
+            if (sellPrices[resource] * qnt > 600)
+            {
+                capitalistAnimator.SetTrigger("Sell2");
+            }
+            else
+            {
+                capitalistAnimator.SetTrigger("Sell");
+            }
         }
         else
         {
-            StartCoroutine(HUDHandler.main.FlashStoreFeedback());
+            StartCoroutine(HUDHandler.main.FlashStoreFeedback("Não possui o suficiente desse recurso!"));
         }
     }
 

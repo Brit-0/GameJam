@@ -8,6 +8,8 @@ public class BriefcaseLogic : MonoBehaviour
     private bool alreadyRewarded;
     private TextMeshProUGUI rewardLbl;
 
+    [SerializeField] bool isRare;
+
     private void Awake()
     {
         rewardLbl = transform.Find("RewardLbl").GetComponent<TextMeshProUGUI>();
@@ -18,7 +20,16 @@ public class BriefcaseLogic : MonoBehaviour
         if (alreadyRewarded) return;
         alreadyRewarded = true;
 
-        int moneyReward = Random.Range(20, 101);
+        int moneyReward;
+
+        if (isRare)
+        {
+            moneyReward = Random.Range(500, 1001);
+        }
+        else
+        {
+            moneyReward = Random.Range(20, 101);
+        }
 
         rewardLbl.text = "+" + moneyReward;
         rewardLbl.gameObject.SetActive(true);

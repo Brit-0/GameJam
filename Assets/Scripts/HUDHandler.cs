@@ -20,7 +20,7 @@ public class HUDHandler : MonoBehaviour
     [SerializeField] TextMeshProUGUI oilLbl;
     [SerializeField] TextMeshProUGUI energyLbl;
     [SerializeField] TextMeshProUGUI ironBarLbl;
-    [SerializeField] TextMeshProUGUI totalEnergyLbl;
+    [SerializeField] TextMeshProUGUI totalCEnergyLbl, totalGEnergyLbl;
     [SerializeField] GameObject feedbackPanel, storeFeedbackPanel;
     [Header("SLIDER")]
     [SerializeField] Slider cO2Slider;
@@ -73,7 +73,8 @@ public class HUDHandler : MonoBehaviour
     public void UpdateQuantities(Machine machine)
     {
         machine.buyable.transform.Find("Quantity/QuantityLbl").GetComponent<TextMeshProUGUI>().text = "x" + machine.qnt;
-        UpdateTotalEnergy();
+        UpdateTotalGEnergy();
+        UpdateTotalCEnergy();
     }
 
     public void UpdatePrice(Machine machine)
@@ -81,7 +82,7 @@ public class HUDHandler : MonoBehaviour
         machine.buyable.transform.Find("Price/PriceLbl").GetComponent<TextMeshProUGUI>().text = machine.price.ToString();
     }
 
-    public void UpdateTotalEnergy()
+    private void UpdateTotalGEnergy()
     {
         float totalEnergy = 0f;
 
@@ -89,9 +90,32 @@ public class HUDHandler : MonoBehaviour
         totalEnergy += Mathf.Round(MachinesHandler.main.oilPowerPlant.generation * MachinesHandler.main.oilPowerPlant.qnt) / Mathf.Round(MachinesHandler.main.oilPowerPlant.delay);
         totalEnergy += Mathf.Round(MachinesHandler.main.solarPanel.generation * MachinesHandler.main.solarPanel.qnt) / Mathf.Round(MachinesHandler.main.solarPanel.delay);
         totalEnergy += Mathf.Round(MachinesHandler.main.windmill.generation * MachinesHandler.main.windmill.qnt) / Mathf.Round(MachinesHandler.main.windmill.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.grandPowerPlant.generation * MachinesHandler.main.grandPowerPlant.qnt) / Mathf.Round(MachinesHandler.main.grandPowerPlant.delay);
 
-        totalEnergyLbl.text = Regex.Replace(totalEnergyLbl.text, "[-+]?\\d+(\\,\\d+)?", totalEnergy.ToString("0.0"));
+        if (totalEnergy <= 0)
+        {
+            return;
+        }
+
+        totalGEnergyLbl.text = Regex.Replace(totalGEnergyLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", totalEnergy.ToString("0.0"));
     }
+    private void UpdateTotalCEnergy()
+    {
+        float totalEnergy = 0f;
+
+        totalEnergy += Mathf.Round(MachinesHandler.main.ironExtractor.energyWaste * MachinesHandler.main.ironExtractor.qnt) / Mathf.Round(MachinesHandler.main.ironExtractor.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.smallMetalIndustry.energyWaste * MachinesHandler.main.smallMetalIndustry.qnt) / Mathf.Round(MachinesHandler.main.smallMetalIndustry.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.oilExtractor.energyWaste * MachinesHandler.main.oilExtractor.qnt) / Mathf.Round(MachinesHandler.main.oilExtractor.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.grandMetalIndustry.energyWaste * MachinesHandler.main.grandMetalIndustry.qnt) / Mathf.Round(MachinesHandler.main.grandMetalIndustry.delay);
+
+        if (totalEnergy < 0)
+        {
+            return;
+        }
+
+        totalCEnergyLbl.text = Regex.Replace(totalCEnergyLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", totalEnergy.ToString("0.0"));
+    }
+
 
     #endregion
 
@@ -125,16 +149,18 @@ public class HUDHandler : MonoBehaviour
         errorIcon.SetActive(false);
     }
 
-    public IEnumerator FlashStoreFeedback()
+    public IEnumerator FlashStoreFeedback(string feedBack)
     {
-        if (!storeFeedbackPanel.activeInHierarchy)
-        {
-            storeFeedbackPanel.SetActive(true);
+        if (storeFeedbackPanel.activeInHierarchy) yield break;
 
-            yield return new WaitForSeconds(2f);
+        storeFeedbackPanel.transform.Find("FBLbl").GetComponent<TextMeshProUGUI>().text = feedBack;
 
-            storeFeedbackPanel.SetActive(false);
-        }
+        storeFeedbackPanel.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        storeFeedbackPanel.SetActive(false);
+
     }
 
     public IEnumerator FlashFeedback(string feedback, float duration = 2f)

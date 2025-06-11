@@ -34,6 +34,10 @@ public class QuestData
     public MoneyReward moneyReward;
     public MachineReward machineReward;
 
+    [Header("PRÓXIMA QUEST")]
+    public bool hasSequencialQuest;
+    public string nextQuest;
+
     //TIPOS
 
     [Serializable]

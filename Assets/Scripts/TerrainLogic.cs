@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -17,7 +18,7 @@ public class TerrainLogic : MonoBehaviour
     [SerializeField] private List<TileBase> treesTiles;
     [SerializeField] private TileBase explosionTile;
     [SerializeField] private TileBase smallReserveTile;
-    [SerializeField] private TileBase[] grandReserveTiles;
+    [SerializeField] private TileBase[] grandReserveTiles, grandMetalIndustryTiles, grandPowerPlant;
 
     [Header("TORNADO")]
     [SerializeField] private GameObject tornadoPF;
@@ -73,7 +74,7 @@ public class TerrainLogic : MonoBehaviour
         Machine machine = (Machine)MachinesHandler.main.GetMachine(currentTile.name);
         machine ??= (Machine)MachinesHandler.main.GetHelper(currentTile.name);
 
-        if (machine.name == "SmallReserve")
+        if (machine.isCombinable)
         {
             CheckCombine(clickedTilepos, machine);
         }
@@ -94,16 +95,16 @@ public class TerrainLogic : MonoBehaviour
         if (clickedTile == grassTile) return;
 
         AudioManager.PlayAudio(AudioManager.main.explosion, .5f);
-        StartCoroutine(Explosion(clickedTilepos));
 
-        Machine machine = (Machine)MachinesHandler.main.GetMachine(clickedTile.name);
-        machine ??= (Machine)MachinesHandler.main.GetHelper(clickedTile.name);
+        Machine machine = OnMachineDestroy(clickedTile.name);
 
-        if (machine != null)
+        if (machine != null && machine.isBigMachine)
         {
-            machine.qnt--;
-            HUDHandler.main.UpdateQuantities(machine);
-            ResourcesHandler.co2Lvl -= machine.co2Lvl;
+            StartCoroutine(BigExplosion(GetMachineBounds(clickedTilepos)));
+        }
+        else
+        { 
+            StartCoroutine(Explosion(clickedTilepos));
         }
 
         StartCoroutine(CompressCounter());
@@ -118,6 +119,15 @@ public class TerrainLogic : MonoBehaviour
         yield return new WaitForSeconds(.5f);
 
         tm.SetTile(cell, grassTile);
+    }
+
+    private IEnumerator BigExplosion(BoundsInt bounds)
+    {
+        tm.SetTilesBlock(bounds, new TileBase[] { explosionTile, explosionTile, explosionTile, explosionTile });
+
+        yield return new WaitForSeconds(.5f);
+
+        tm.SetTilesBlock(bounds, new TileBase[] { grassTile, grassTile, grassTile, grassTile });
     }
 
     private void ChopTile()
@@ -153,7 +163,6 @@ public class TerrainLogic : MonoBehaviour
             tornadoCounter++;
             numOfTornadoes = (int)Mathf.Pow(2, tornadoCounter);
         }
-
     }
 
     [ContextMenu("TORNADO")]
@@ -161,8 +170,12 @@ public class TerrainLogic : MonoBehaviour
     {
         for (int i = 0; i < numOfTornadoes; i++)
         {
-
             isTornadoing = true;
+
+            if (!AudioManager.tornadoSource.isPlaying)
+            {
+                AudioManager.main.PlayTornadoAudio(AudioManager.main.tornado, AudioManager.main.siren);
+            }
 
             if (tornadoCounter == 0)
             {
@@ -206,7 +219,7 @@ public class TerrainLogic : MonoBehaviour
         }
     }
 
-    public IEnumerator RestoreTiles(List<Vector3Int> cellsToRestore)
+    public IEnumerator RestoreTiles(List<Vector3Int> cellsToRestore, bool hasExtraCells = default, BoundsInt extraCells = default)
     {
         yield return new WaitForSeconds(5f);
 
@@ -214,9 +227,16 @@ public class TerrainLogic : MonoBehaviour
         {
             tm.SetTile(cell, grassTile);
         }
+
+        if (hasExtraCells)
+        {
+            tm.SetTilesBlock(extraCells, new TileBase[] { grassTile, grassTile, grassTile, grassTile });
+        }
     }
 
     #endregion
+
+    #region BIG MACHINES
 
     private void CheckCombine(Vector3Int cell, Machine machine)
     {
@@ -247,23 +267,50 @@ public class TerrainLogic : MonoBehaviour
                             int yMin = Mathf.Min(cell.y, (cell + directionsUpDown[k]).y);
 
                             BoundsInt bounds = new BoundsInt(xMin, yMin, cell.z, 2, 2, 1);
+                            TileBase[] tiles = new TileBase[4];
+                            Machine newMachine = new();
 
-                            tm.SetTilesBlock(bounds, grandReserveTiles);
+                            if (machine.name == "SmallReserve")
+                            {
+                                tiles = grandReserveTiles;
+                                newMachine = MachinesHandler.main.grandReserve;
+                            }
+                            else if (machine.name == "SmallMetalIndustry")
+                            {
+                                tiles = grandMetalIndustryTiles;
+                                newMachine = MachinesHandler.main.grandMetalIndustry;
+
+                                if (newMachine.qnt == 0)
+                                {
+                                    MachinesHandler.main.StartCoroutine(MachinesHandler.main.GrandMetalIndustryCoroutine());
+                                }
+                            }
+                            else if (machine.name == "ThermalPowerPlant")
+                            {
+                                tiles = grandPowerPlant;
+                                newMachine = MachinesHandler.main.grandPowerPlant;
+
+                                if (newMachine.qnt == 0)
+                                {
+                                    MachinesHandler.main.StartCoroutine(MachinesHandler.main.GrandPowerPlantCoroutine());
+                                }
+                            }
+
+                            tm.SetTilesBlock(bounds, tiles);
 
                             machine.qnt -= 4;
                             HUDHandler.main.UpdateQuantities(machine);
 
-                            Machine newMachine = (Machine)MachinesHandler.main.GetHelper("GrandReserve");
                             newMachine.qnt++;
-                            newMachine.bounds = bounds;
                             HUDHandler.main.UpdateQuantities(newMachine);
 
                             if (newMachine.qnt == 1)
                             {
                                 HUDHandler.main.UnlockPage();
+                                HUDHandler.main.FirstPurchaseUpdate(newMachine);
                             }
 
-                            ResourcesHandler.co2Lvl -= machine.co2Lvl;
+                            ResourcesHandler.co2Lvl -= machine.co2Lvl * 4;
                             ResourcesHandler.co2Lvl += newMachine.co2Lvl;
                         }
                     }
@@ -272,6 +319,57 @@ public class TerrainLogic : MonoBehaviour
         }
     }
 
+    public BoundsInt GetMachineBounds(Vector3Int cell)
+    {
+        TileBase tile = tm.GetTile(cell);
+
+        Machine machine = (Machine)MachinesHandler.main.GetMachine(tile.name);
+        machine ??= (Machine)MachinesHandler.main.GetHelper(tile.name);
+
+        int xMin = 0, yMin = 0;
+
+        if (tile.name == machine.name + "DL")
+        {
+            xMin = cell.x;
+            yMin = cell.y;
+        }
+        else if (tile.name == machine.name + "DR")
+        {
+            xMin = (cell + Vector3Int.left).x;
+            yMin = (cell + Vector3Int.left).y;
+        }
+        else if (tile.name == machine.name + "UL")
+        {
+            xMin = (cell + Vector3Int.down).x;
+            yMin = (cell + Vector3Int.down).y;
+        }
+        else if (tile.name == machine.name + "UR")
+        {
+            xMin = (cell + Vector3Int.down + Vector3Int.left).x;
+            yMin = (cell + Vector3Int.down + Vector3Int.left).y;
+        }
+
+        BoundsInt bounds = new BoundsInt(xMin, yMin, cell.z, 2, 2, 1);
+
+        return bounds; 
+    }
+
+    #endregion
+
+    public Machine OnMachineDestroy(string machineName)
+    {
+        Machine machine = (Machine)MachinesHandler.main.GetMachine(machineName);
+        machine ??= (Machine)MachinesHandler.main.GetHelper(machineName);
+
+        if (machine != null)
+        {
+            machine.qnt--;
+            HUDHandler.main.UpdateQuantities(machine);
+            ResourcesHandler.co2Lvl -= machine.co2Lvl;
+        }
+
+        return machine;
+    }
     private IEnumerator CompressCounter()
     {
         yield return new WaitForSeconds(1.5f);

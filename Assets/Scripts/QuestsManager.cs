@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using UnityEngine;
@@ -13,8 +14,11 @@ public class QuestsManager : MonoBehaviour
     [Header("REFERENCIAS")]
     [SerializeField] private GameObject questBarPF;
     [SerializeField] private Transform limiter;
+    [SerializeField] private GameObject questLbl;
+    [SerializeField] GameObject questExclamationIcon;
 
     private List<QuestData> questsToRemove = new();
+    private List<QuestData> questsToAdd = new();
 
     private void Awake()
     {
@@ -39,25 +43,51 @@ public class QuestsManager : MonoBehaviour
             {
                 quest.isCompleted = true;
                 quest.questBar.GetComponent<Button>().interactable = true;
+                questLbl.SetActive(true);
+                questExclamationIcon.SetActive(true);
             }
         }
 
         if (questsToRemove.Count > 0)
         {
             activeQuests.Remove(questsToRemove[0]);
+            questsToRemove.Remove(questsToRemove[0]);
         }
-        
+
+        if (questsToAdd.Count > 0)
+        {
+            if (AddQuest(questsToAdd[0]))
+            {
+                questsToAdd.Remove(questsToAdd[0]);
+            }
+        }
+
+        CompletedFeedback();
     }
 
-    [ContextMenu("ADICIONAR QUEST")]
-    public void AddQuest(QuestData quest)
+    private QuestData GetQuest(string description)
     {
-        if (activeQuests.Count >= 7) return;
+        foreach (QuestData quest in availableQuests)
+        {
+            if (quest.description == description)
+            {
+                return quest;
+            }
+        }
+
+        return null;
+    }
+
+    public bool AddQuest(QuestData quest)
+    {
+        if (activeQuests.Count >= 7) return false;
 
         activeQuests.Add(quest); 
         GameObject questBar = Instantiate(questBarPF, limiter);
         quest.questBar = questBar;
         questBar.GetComponent<QuestBar>().SetBar(quest);
+
+        return true;
     }
 
     private bool CheckIfCompleted(QuestData quest)
@@ -74,6 +104,7 @@ public class QuestsManager : MonoBehaviour
 
             case QuestType.HaveMachines:
                 Machine machine = (Machine)MachinesHandler.main.GetMachine(quest.machineQuest.machineNeededName);
+                machine ??= (Machine)MachinesHandler.main.GetHelper(quest.machineQuest.machineNeededName);
 
                 if (machine.qnt >= quest.machineQuest.neededAmount)
                 {
@@ -100,15 +131,43 @@ public class QuestsManager : MonoBehaviour
         {
             case QuestRewardType.Money:
                 ResourcesHandler.money += quest.moneyReward.moneyAmount;
+                AudioManager.PlayAudio(AudioManager.main.sell);
 
                 break;
 
             case QuestRewardType.MachineUnlock:
                 Machine machine = (Machine)MachinesHandler.main.GetMachine(quest.machineReward.machineName);
                 machine.buyable.SetActive(true);
+                StartCoroutine(HUDHandler.main.FlashStoreFeedback("Desbloqueou uma máquina nova!"));
+
                 break;
         }
 
+        if (quest.hasSequencialQuest)
+        {
+            questsToAdd.Add(GetQuest(quest.nextQuest));
+        }
+
         questsToRemove.Add(quest);
+    }
+
+    private void CompletedFeedback()
+    {
+        bool hasCompleted = false;
+
+        foreach (QuestData quest in activeQuests)
+        {
+            if (quest.isCompleted)
+            {
+                hasCompleted = true;
+                break;
+            }
+        }
+
+        if (!hasCompleted)
+        {
+            questLbl.SetActive(false);
+            questExclamationIcon.SetActive(false);
+        }
     }
 }

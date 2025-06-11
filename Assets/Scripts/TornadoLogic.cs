@@ -59,6 +59,7 @@ public class TornadoLogic : MonoBehaviour
     private void DestroyTiles()
     {
         Vector3Int ogCell = tm.WorldToCell(locationsToGo[currentMoveIndex]);
+
         List<Vector3Int> cellsToDestroy = new()
         {
             ogCell + Vector3Int.up,
@@ -72,24 +73,26 @@ public class TornadoLogic : MonoBehaviour
             ogCell + Vector3Int.down + Vector3Int.right
         };
 
+        BoundsInt extraCells = new();
+        bool hasExtraCells = false;
+
         foreach (Vector3Int cell in cellsToDestroy)
         {
             if (!tm.HasTile(cell)) return;
 
-            Machine machine = (Machine)MachinesHandler.main.GetMachine(tm.GetTile(cell).name);
-            machine ??= (Machine)MachinesHandler.main.GetHelper(tm.GetTile(cell).name);
+            Machine machine = TerrainLogic.main.OnMachineDestroy(tm.GetTile(cell).name);
+
+            if (machine != null && machine.isBigMachine)
+            {
+                hasExtraCells = true;
+                extraCells = TerrainLogic.main.GetMachineBounds(cell);
+                tm.SetTilesBlock(extraCells, new TileBase[] { destroyedTile, destroyedTile, destroyedTile, destroyedTile });               
+            }
 
             tm.SetTile(cell, destroyedTile);
-
-            if (machine != null)
-            {
-                machine.qnt--;
-                HUDHandler.main.UpdateQuantities(machine);
-                ResourcesHandler.co2Lvl -= machine.co2Lvl;
-            }
         }
 
-        TerrainLogic.main.StartCoroutine(TerrainLogic.main.RestoreTiles(cellsToDestroy));
+        TerrainLogic.main.StartCoroutine(TerrainLogic.main.RestoreTiles(cellsToDestroy, hasExtraCells, extraCells));
     }
 
     private void Fade()
@@ -113,10 +116,17 @@ public class TornadoLogic : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         TerrainLogic.main.activeTornadoes.Remove(gameObject);
-        if (TerrainLogic.main.activeTornadoes.Count == 0)
+
+        if (TerrainLogic.main.activeTornadoes.Count == 0 )
         {
             TerrainLogic.main.isTornadoing = false;
-            HUDHandler.main.CapitalistDemon(false);
+
+            if (ResourcesHandler.co2Lvl < 10)
+            {
+                HUDHandler.main.CapitalistDemon(false);
+                AudioManager.main.StartCoroutine(AudioManager.main.AudioFadeOut(AudioManager.tornadoSource, 0.01f));
+                AudioManager.main.StartCoroutine(AudioManager.main.AudioFadeOut(AudioManager.sirenSource, 0.001f));
+            }    
         }
         TerrainLogic.main.StartCoroutine(TerrainLogic.main.IncreaseTornadoCounter());
         Destroy(gameObject);
