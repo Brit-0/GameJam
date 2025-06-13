@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class Machine
@@ -12,7 +14,7 @@ public class Machine
     public int qnt;
     [Header("GERAÇÃO")]
     public int generation;
-    public int delay;
+    public float delay;
     [Header("CONSUMO")]
     public int consumption;
     public int energyWaste;
@@ -42,10 +44,12 @@ public class MachinesHandler : MonoBehaviour
 
     [HideInInspector]
     public Machine coalExtractor, oilExtractor, thermalPowerPlant, ironExtractor, smallMetalIndustry, oilPowerPlant, solarPanel, windmill;
+    [HideInInspector]
     public Machine grandMetalIndustry, grandPowerPlant;
     [HideInInspector]
     public Machine smallReserve, grandReserve;
     private const int dinamitePrice = 50, axePrice = 30;
+    private int overclockPrice = 500;
 
     private void Awake()
     {
@@ -187,6 +191,7 @@ public class MachinesHandler : MonoBehaviour
     {
         if (ResourcesHandler.money >= dinamitePrice)
         {
+            AudioManager.PlayAudio(AudioManager.main.buy);
             ResourcesHandler.money -= dinamitePrice;
 
             TerrainLogic.isDemolishing = true;
@@ -206,6 +211,7 @@ public class MachinesHandler : MonoBehaviour
     {
         if (ResourcesHandler.money >= axePrice)
         {
+            AudioManager.PlayAudio(AudioManager.main.buy);
             ResourcesHandler.money -= axePrice;
 
             TerrainLogic.isChopping = true;
@@ -218,6 +224,22 @@ public class MachinesHandler : MonoBehaviour
         else
         {
             StartCoroutine(HUDHandler.main.FlashFeedback("Precisa de mais " + (axePrice - ResourcesHandler.money) + " reais", 2f));
+        }
+    }
+
+    public void BuyOverclock()
+    {
+        if (ResourcesHandler.money >= overclockPrice)
+        {
+            AudioManager.PlayAudio(AudioManager.main.buy);
+            ResourcesHandler.money -= overclockPrice;
+
+            ResourcesHandler.currentOverclocks++;
+            ResourcesHandler.totalOverclocks++;
+        }
+        else
+        {
+            //Feedback de pouco dinheiro
         }
     }
 
@@ -305,8 +327,9 @@ public class MachinesHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(smallMetalIndustry.delay);
 
-        if (ResourcesHandler.iron >= smallMetalIndustry.consumption * smallMetalIndustry.qnt && ResourcesHandler.energy >= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt)
-        {
+        if (ResourcesHandler.iron >= smallMetalIndustry.consumption * smallMetalIndustry.qnt && 
+            ResourcesHandler.energy >= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt)
+        {   
             ResourcesHandler.iron -= smallMetalIndustry.consumption * smallMetalIndustry.qnt;
             ResourcesHandler.energy -= smallMetalIndustry.energyWaste * smallMetalIndustry.qnt;
 
@@ -324,11 +347,12 @@ public class MachinesHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(grandMetalIndustry.delay);
 
-        if (ResourcesHandler.iron >= grandMetalIndustry.consumption * grandMetalIndustry.qnt && ResourcesHandler.energy >= grandMetalIndustry.energyWaste * grandMetalIndustry.qnt)
+        if (ResourcesHandler.iron >= grandMetalIndustry.consumption * grandMetalIndustry.qnt && 
+            ResourcesHandler.energy >= grandMetalIndustry.energyWaste * grandMetalIndustry.qnt)
         {
             ResourcesHandler.iron -= grandMetalIndustry.consumption * grandMetalIndustry.qnt;
             ResourcesHandler.energy -= grandMetalIndustry.energyWaste * grandMetalIndustry.qnt;
-
+                
             ResourcesHandler.ironBar += grandMetalIndustry.qnt * grandMetalIndustry.generation;
         }
         else
@@ -375,7 +399,6 @@ public class MachinesHandler : MonoBehaviour
     }
 
     #endregion
-
 
     public Machine GetMachineFromResource(Resource resource)
     {

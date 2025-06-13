@@ -86,11 +86,11 @@ public class HUDHandler : MonoBehaviour
     {
         float totalEnergy = 0f;
 
-        totalEnergy += Mathf.Round(MachinesHandler.main.thermalPowerPlant.generation * MachinesHandler.main.thermalPowerPlant.qnt) / Mathf.Round(MachinesHandler.main.thermalPowerPlant.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.oilPowerPlant.generation * MachinesHandler.main.oilPowerPlant.qnt) / Mathf.Round(MachinesHandler.main.oilPowerPlant.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.solarPanel.generation * MachinesHandler.main.solarPanel.qnt) / Mathf.Round(MachinesHandler.main.solarPanel.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.windmill.generation * MachinesHandler.main.windmill.qnt) / Mathf.Round(MachinesHandler.main.windmill.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.grandPowerPlant.generation * MachinesHandler.main.grandPowerPlant.qnt) / Mathf.Round(MachinesHandler.main.grandPowerPlant.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.thermalPowerPlant.generation * MachinesHandler.main.thermalPowerPlant.qnt) / MachinesHandler.main.thermalPowerPlant.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.oilPowerPlant.generation * MachinesHandler.main.oilPowerPlant.qnt) / MachinesHandler.main.oilPowerPlant.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.solarPanel.generation * MachinesHandler.main.solarPanel.qnt) / MachinesHandler.main.solarPanel.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.windmill.generation * MachinesHandler.main.windmill.qnt) / MachinesHandler.main.windmill.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.grandPowerPlant.generation * MachinesHandler.main.grandPowerPlant.qnt) / MachinesHandler.main.grandPowerPlant.delay;
 
         if (totalEnergy <= 0)
         {
@@ -103,10 +103,10 @@ public class HUDHandler : MonoBehaviour
     {
         float totalEnergy = 0f;
 
-        totalEnergy += Mathf.Round(MachinesHandler.main.ironExtractor.energyWaste * MachinesHandler.main.ironExtractor.qnt) / Mathf.Round(MachinesHandler.main.ironExtractor.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.smallMetalIndustry.energyWaste * MachinesHandler.main.smallMetalIndustry.qnt) / Mathf.Round(MachinesHandler.main.smallMetalIndustry.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.oilExtractor.energyWaste * MachinesHandler.main.oilExtractor.qnt) / Mathf.Round(MachinesHandler.main.oilExtractor.delay);
-        totalEnergy += Mathf.Round(MachinesHandler.main.grandMetalIndustry.energyWaste * MachinesHandler.main.grandMetalIndustry.qnt) / Mathf.Round(MachinesHandler.main.grandMetalIndustry.delay);
+        totalEnergy += Mathf.Round(MachinesHandler.main.ironExtractor.energyWaste * MachinesHandler.main.ironExtractor.qnt) / MachinesHandler.main.ironExtractor.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.smallMetalIndustry.energyWaste * MachinesHandler.main.smallMetalIndustry.qnt) / MachinesHandler.main.smallMetalIndustry.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.oilExtractor.energyWaste * MachinesHandler.main.oilExtractor.qnt) / MachinesHandler.main.oilExtractor.delay;
+        totalEnergy += Mathf.Round(MachinesHandler.main.grandMetalIndustry.energyWaste * MachinesHandler.main.grandMetalIndustry.qnt) / MachinesHandler.main.grandMetalIndustry.delay;
 
         if (totalEnergy < 0)
         {
@@ -183,7 +183,8 @@ public class HUDHandler : MonoBehaviour
     {
         LeanTween.color(machine.buyable.transform.Find("Button/MachineIcon").GetComponent<RectTransform>(), Color.white, 1f);
         machine.buyable.transform.Find("Quantity").gameObject.SetActive(true);
-        machine.buyable.transform.Find("Tip").gameObject.SetActive(true);
+        machine.buyable.transform.Find("TipCanvas/Tip").gameObject.SetActive(true);
+        machine.buyable.transform.Find("Overclock").gameObject.SetActive(true);
     }
 
     public void ChangePage(bool next)

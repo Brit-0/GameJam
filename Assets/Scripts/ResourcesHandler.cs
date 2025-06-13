@@ -23,6 +23,9 @@ public class ResourcesHandler : MonoBehaviour
 
     public static int co2Lvl;
 
+    public static int totalOverclocks;
+    public static int currentOverclocks;
+
     private void Awake()
     {
         main = this;
@@ -33,6 +36,8 @@ public class ResourcesHandler : MonoBehaviour
         energy = 0;
         ironBar = 0;
         co2Lvl = 0;
+        totalOverclocks = 0;
+        currentOverclocks = 0;
     }
 
     public int GetResource(Resource resource)

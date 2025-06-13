@@ -18,14 +18,14 @@ public class TooltipLogic : MonoBehaviour
         Machine machine = (Machine)MachinesHandler.main.GetMachine(machineName);
 
         TextMeshProUGUI CtipLbl = tipPanel.transform.Find("CTipLbl").GetComponent<TextMeshProUGUI>();
-        CtipLbl.text = Regex.Replace(CtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.consumption) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
+        CtipLbl.text = Regex.Replace(CtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.consumption) / machine.delay * machine.qnt).ToString("0.0"));
 
         TextMeshProUGUI EtipLbl = tipPanel.transform.Find("ETipLbl").GetComponent<TextMeshProUGUI>();
-        EtipLbl.text = Regex.Replace(EtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.energyWaste) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
+        EtipLbl.text = Regex.Replace(EtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.energyWaste) / machine.delay * machine.qnt).ToString("0.0"));
 
 
         TextMeshProUGUI GtipLbl = tipPanel.transform.Find("GTipLbl").GetComponent<TextMeshProUGUI>();  
-        GtipLbl.text = Regex.Replace(GtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.generation) / Mathf.Round(machine.delay) * machine.qnt).ToString("0.0"));
+        GtipLbl.text = Regex.Replace(GtipLbl.text, @"\b\d+\.\d+|\b\d+,\d+\b", (Mathf.Round(machine.generation) / machine.delay * machine.qnt).ToString("0.0"));
 
 
         tipPanel.SetActive(true);

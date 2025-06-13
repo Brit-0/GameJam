@@ -54,6 +54,11 @@ public class GameplayManager : MonoBehaviour
                 quitPanel.GetComponent<UITweener>().PopUpTween(1f);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ResourcesHandler.currentOverclocks++;
+        }
     }
 
     public void ResetGame()
