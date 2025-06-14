@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum Resource
@@ -8,6 +9,12 @@ public enum Resource
     Petróleo,
     Energia,
     
+}
+
+public enum OverclockType
+{
+    Energy,
+    Resource
 }
 
 public class ResourcesHandler : MonoBehaviour
@@ -23,8 +30,8 @@ public class ResourcesHandler : MonoBehaviour
 
     public static int co2Lvl;
 
-    public static int totalOverclocks;
-    public static int currentOverclocks;
+    public static int totalROverclocks, totalEOverclocks;
+    public static int currentROverclocks, currentEOverclocks;
 
     private void Awake()
     {
@@ -36,8 +43,10 @@ public class ResourcesHandler : MonoBehaviour
         energy = 0;
         ironBar = 0;
         co2Lvl = 0;
-        totalOverclocks = 0;
-        currentOverclocks = 0;
+        totalROverclocks = 0;
+        totalEOverclocks = 0;
+        currentEOverclocks = 0;
+        currentROverclocks = 0;
     }
 
     public int GetResource(Resource resource)
@@ -66,4 +75,14 @@ public class ResourcesHandler : MonoBehaviour
         }
     }
 
+    public OverclockType GetOverclockType(string type)
+    {
+        switch (type)
+        {
+            case "Resource": return OverclockType.Resource;
+            case "Energy": return OverclockType.Energy;
+        }
+
+        return default;
+    }
 }

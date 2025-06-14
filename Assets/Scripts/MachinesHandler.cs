@@ -30,7 +30,6 @@ public class Machine
     public bool alreadyBought;
 }
 
-
 public class MachinesHandler : MonoBehaviour
 {
     public static MachinesHandler main;
@@ -49,7 +48,7 @@ public class MachinesHandler : MonoBehaviour
     [HideInInspector]
     public Machine smallReserve, grandReserve;
     private const int dinamitePrice = 50, axePrice = 30;
-    private int overclockPrice = 500;
+    private int rOverclockPrice = 500, eOverclockPrice = 500;
 
     private void Awake()
     {
@@ -227,15 +226,36 @@ public class MachinesHandler : MonoBehaviour
         }
     }
 
-    public void BuyOverclock()
+   
+    public void BuyOverclock(string typeName)
     {
-        if (ResourcesHandler.money >= overclockPrice)
+        int price;
+        OverclockType type = ResourcesHandler.main.GetOverclockType(typeName);
+
+        if (type == OverclockType.Resource)
+        {
+            price = rOverclockPrice;
+        }
+        else
+        {
+            price = rOverclockPrice;
+        }
+
+        if (ResourcesHandler.money >= price)
         {
             AudioManager.PlayAudio(AudioManager.main.buy);
-            ResourcesHandler.money -= overclockPrice;
+            ResourcesHandler.money -= price;
 
-            ResourcesHandler.currentOverclocks++;
-            ResourcesHandler.totalOverclocks++;
+            if (type == OverclockType.Resource)
+            {
+                ResourcesHandler.currentROverclocks++;
+                ResourcesHandler.totalROverclocks++;
+            }
+            else
+            {
+                ResourcesHandler.currentEOverclocks++;
+                ResourcesHandler.totalEOverclocks++;
+            }
         }
         else
         {

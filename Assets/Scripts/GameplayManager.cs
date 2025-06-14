@@ -55,9 +55,13 @@ public class GameplayManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            ResourcesHandler.currentOverclocks++;
+            ResourcesHandler.currentROverclocks++;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            ResourcesHandler.currentEOverclocks++;
         }
     }
 

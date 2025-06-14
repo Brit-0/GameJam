@@ -183,6 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52a041d20ec3f2940a4222cba7134ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 1
   lvlIcons:
   - {fileID: 21300000, guid: 76a5803cbd27e284faecca979aaaad04, type: 3}
   - {fileID: 21300000, guid: 54c112feb21f2cb40a35860ec5b036c7, type: 3}

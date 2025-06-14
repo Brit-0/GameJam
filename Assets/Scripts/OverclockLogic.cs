@@ -9,6 +9,8 @@ public class OverclockLogic : MonoBehaviour
     private int currentLvl;
 
     Machine machine;
+
+    [SerializeField] OverclockType type;
     
     [SerializeField] Sprite[] lvlIcons = new Sprite[4];
 
@@ -23,10 +25,30 @@ public class OverclockLogic : MonoBehaviour
 
     public void IncreaseLevel()
     {
-        if (ResourcesHandler.currentOverclocks > 0 && currentLvl < 3) //APLICAR PRÓXIMO NÍVEL
+        int current;
+
+        if (type == OverclockType.Resource)
+        {
+            current = ResourcesHandler.currentROverclocks;
+        }
+        else
+        {
+            current = ResourcesHandler.currentEOverclocks;
+        }
+
+        if (current > 0 && currentLvl < 3) //APLICAR PRÓXIMO NÍVEL
         {
             currentLvl++;
-            ResourcesHandler.currentOverclocks--;
+
+            if(type == OverclockType.Resource)
+            {
+                ResourcesHandler.currentROverclocks--;
+            }
+            else
+            {
+                ResourcesHandler.currentEOverclocks--;
+            }
+
             machine.delay /= 2;
             ps.Play();
         }
@@ -34,11 +56,19 @@ public class OverclockLogic : MonoBehaviour
         {
             if (currentLvl == 0)
             {
-                StartCoroutine(HUDHandler.main.FlashFeedback("Não possui overclocks o suficiente!"));
+                StartCoroutine(HUDHandler.main.FlashFeedback("Não possui overclocks suficientes desse tipo!"));
             }
             else
             {
-                ResourcesHandler.currentOverclocks += currentLvl;
+                if (type == OverclockType.Resource)
+                {
+                    ResourcesHandler.currentROverclocks += currentLvl;
+                }
+                else
+                {
+                    ResourcesHandler.currentEOverclocks += currentLvl;
+                }
+
                 machine.delay *= Mathf.Pow(2, currentLvl);
                 currentLvl = 0;
                 ps.Stop();
